@@ -1,0 +1,234 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-12T17:00:00+00:00",
+  "title": "Design System: Epsilon Marketplace",
+  "name": "Epsilon Marketplace",
+  "description": "Système de design transactionnel, fluide et hautement responsive pour la place de marché Epsilon au Togo et en Afrique de l'Ouest.",
+  "tokens": {
+    "colors": {
+      "primary": "#091426",
+      "primary-container": "#1e293b",
+      "on-primary": "#ffffff",
+      "on-primary-container": "#8590a6",
+      "primary-fixed": "#d8e3fb",
+      "primary-fixed-dim": "#bcc7de",
+      "on-primary-fixed": "#111c2d",
+      "on-primary-fixed-variant": "#3c475a",
+      "inverse-primary": "#bcc7de",
+      "secondary": "#006c4a",
+      "secondary-container": "#82f5c1",
+      "on-secondary": "#ffffff",
+      "on-secondary-container": "#00714e",
+      "secondary-fixed": "#85f8c4",
+      "secondary-fixed-dim": "#68dba9",
+      "on-secondary-fixed": "#002114",
+      "on-secondary-fixed-variant": "#005137",
+      "tertiary": "#0b0054",
+      "tertiary-container": "#1a008e",
+      "on-tertiary": "#ffffff",
+      "on-tertiary-container": "#8580ff",
+      "tertiary-fixed": "#e3dfff",
+      "tertiary-fixed-dim": "#c3c0ff",
+      "on-tertiary-fixed": "#100069",
+      "on-tertiary-fixed-variant": "#372abf",
+      "surface": "#f7f9fb",
+      "surface-dim": "#d8dadc",
+      "surface-bright": "#f7f9fb",
+      "surface-variant": "#e0e3e5",
+      "surface-container-lowest": "#ffffff",
+      "surface-container-low": "#f2f4f6",
+      "surface-container": "#eceef0",
+      "surface-container-high": "#e6e8ea",
+      "surface-container-highest": "#e0e3e5",
+      "on-surface": "#191c1e",
+      "on-surface-variant": "#45474c",
+      "inverse-surface": "#2d3133",
+      "inverse-on-surface": "#eff1f3",
+      "outline": "#75777d",
+      "outline-variant": "#c5c6cd",
+      "surface-tint": "#545f73",
+      "background": "#f7f9fb",
+      "on-background": "#191c1e",
+      "error": "#ba1a1a",
+      "error-container": "#ffdad6",
+      "on-error": "#ffffff",
+      "on-error-container": "#93000a"
+    },
+    "typography": {
+      "fontFamily": "Plus Jakarta Sans, system-ui, -apple-system, sans-serif",
+      "scales": {
+        "headline-xl": { "fontSize": "40px", "fontWeight": "800", "lineHeight": "48px" },
+        "headline-xl-mobile": { "fontSize": "30px", "fontWeight": "800", "lineHeight": "38px" },
+        "headline-lg": { "fontSize": "32px", "fontWeight": "700", "lineHeight": "40px" },
+        "headline-lg-mobile": { "fontSize": "24px", "fontWeight": "700", "lineHeight": "32px" },
+        "headline-md": { "fontSize": "22px", "fontWeight": "700", "lineHeight": "28px" },
+        "headline-sm": { "fontSize": "18px", "fontWeight": "600", "lineHeight": "24px" },
+        "body-lg": { "fontSize": "16px", "fontWeight": "400", "lineHeight": "24px" },
+        "body-md": { "fontSize": "14px", "fontWeight": "400", "lineHeight": "20px" },
+        "body-sm": { "fontSize": "12px", "fontWeight": "400", "lineHeight": "16px" },
+        "label-lg": { "fontSize": "14px", "fontWeight": "600", "lineHeight": "20px" },
+        "label-md": { "fontSize": "12px", "fontWeight": "600", "lineHeight": "16px" },
+        "label-sm": { "fontSize": "11px", "fontWeight": "700", "lineHeight": "14px" },
+        "price-lg": { "fontSize": "24px", "fontWeight": "800", "lineHeight": "28px" },
+        "price-md": { "fontSize": "18px", "fontWeight": "800", "lineHeight": "22px" }
+      }
+    },
+    "borderRadius": {
+      "sm": "0.25rem",
+      "DEFAULT": "0.5rem",
+      "md": "0.75rem",
+      "lg": "1rem",
+      "xl": "1.5rem",
+      "full": "9999px"
+    },
+    "spacing": {
+      "gutter": "1.25rem",
+      "gutter-desktop": "1.5rem",
+      "margin": "1rem",
+      "margin-tablet": "1.5rem",
+      "margin-desktop": "2.5rem",
+      "space-xs": "0.25rem",
+      "space-sm": "0.5rem",
+      "space-md": "1rem",
+      "space-lg": "1.5rem",
+      "space-xl": "2.5rem"
+    },
+    "shadows": {
+      "card-rest": "0 1px 3px 0 rgba(15, 23, 42, 0.04), 0 1px 2px -1px rgba(15, 23, 42, 0.04)",
+      "card-hover": "0 10px 15px -3px rgba(15, 23, 42, 0.06), 0 4px 6px -4px rgba(15, 23, 42, 0.04)",
+      "overlay": "0 20px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04)"
+    }
+  },
+  "responsive": {
+    "viewport": "width=device-width, initial-scale=1.0, maximum-scale=5.0",
+    "breakpoints": {
+      "mobile": {
+        "min": "320px",
+        "nominal": "390px",
+        "max": "767px",
+        "columns": 4,
+        "margin": "1rem",
+        "gutter": "0.75rem",
+        "typography": {
+          "headline-xl": "headline-xl-mobile",
+          "headline-lg": "headline-lg-mobile"
+        },
+        "layoutRules": {
+          "containerMaxWidth": "100%",
+          "paddingInline": "1rem",
+          "headerNavigation": "collapsed_in_drawer_or_mobile_bar",
+          "headerSearch": "collapsible_or_quick_input",
+          "mobileBottomBar": "fixed_bottom_z50_height_64px",
+          "categoryGridColumns": 2,
+          "listingGridColumns": 1,
+          "ctaBannerDirection": "column",
+          "trustPillarsColumns": 1,
+          "footerColumns": 1
+        }
+      },
+      "tablet": {
+        "min": "768px",
+        "max": "1023px",
+        "columns": 8,
+        "margin": "1.5rem",
+        "gutter": "1.25rem",
+        "layoutRules": {
+          "containerMaxWidth": "100%",
+          "paddingInline": "1.5rem",
+          "headerNavigation": "partially_visible",
+          "headerSearch": "visible_inline_flex",
+          "mobileBottomBar": "hidden",
+          "categoryGridColumns": 3,
+          "listingGridColumns": 2,
+          "ctaBannerDirection": "column",
+          "trustPillarsColumns": 2,
+          "footerColumns": 2
+        }
+      },
+      "desktop": {
+        "min": "1024px",
+        "nominal": "1320px",
+        "max": "1440px",
+        "columns": 12,
+        "margin": "2.5rem",
+        "gutter": "1.5rem",
+        "layoutRules": {
+          "containerMaxWidth": "1320px",
+          "paddingInline": "2.5rem",
+          "headerNavigation": "full_horizontal_bar",
+          "headerSearch": "expanded_with_filters",
+          "mobileBottomBar": "hidden",
+          "categoryGridColumns": 6,
+          "listingGridColumns": 4,
+          "ctaBannerDirection": "row",
+          "trustPillarsColumns": 4,
+          "footerColumns": 5
+        }
+      }
+    },
+    "componentAdaptations": [
+      {
+        "component": "Header",
+        "mobile": "Logo compact, barre de recherche condensée, actions essentielles, bouton menu drawer.",
+        "desktop": "Barre de recherche complète (mots-clés + catégorie + ville), navigation liens, boutons favoris/messages/déposer et avatar."
+      },
+      {
+        "component": "MobileBottomBar",
+        "mobile": "Barre fixe en bas (z-index 50) avec 5 boutons tactiles (Accueil, Explorer, + Déposer, Messages avec badge, Compte).",
+        "desktop": "Masqué (display: none)."
+      },
+      {
+        "component": "HeroSection",
+        "mobile": "Titre responsive 30px, barre de recherche empilée verticalement, métriques de confiance en 1 colonne.",
+        "desktop": "Titre 40px, barre de recherche unifiée en ligne avec sélecteur de localité, 3 badges métriques horizontaux."
+      },
+      {
+        "component": "CategoriesGrid",
+        "mobile": "Grille à 2 colonnes avec cartes compactes tactiles.",
+        "tablet": "Grille à 3 colonnes.",
+        "desktop": "Grille à 6 colonnes avec effets de survol hover:translate-y."
+      },
+      {
+        "component": "ListingCardsGrid",
+        "mobile": "1 colonne plein écran avec hauteur optimisée pour le scroll ou 2 colonnes denses.",
+        "tablet": "2 colonnes avec marges adaptées.",
+        "desktop": "4 colonnes régulières au format 12 colonnes."
+      },
+      {
+        "component": "CtaBanner",
+        "mobile": "Disposition verticale, bouton d'action pleine largeur, guide en 3 étapes empilé.",
+        "desktop": "Disposition horizontale avec guide en 3 colonnes horizontales."
+      },
+      {
+        "component": "Footer",
+        "mobile": "1 colonne empilée avec accordéons ou espacement vertical.",
+        "desktop": "Grille à 5 colonnes incluant logo, à propos, sécurité, catégories et contact."
+      }
+    ]
+  },
+  "narrative": {
+    "northStar": "La place de marché de référence au Togo et en Afrique de l'Ouest",
+    "overview": "Une architecture visuelle fonctionnelle, tactique et ergonomique combinant confiance institutionnelle (Bleu nuit #091426) et énergie transactionnelle (Émeraude #006c4a).",
+    "keyCharacteristics": [
+      "Navigation adaptative multi-écrans (desktop fluide et barre d'utilitaires tactile mobile)",
+      "Typographie hiérarchisée Plus Jakarta Sans avec alignement tabulaire des prix",
+      "Surfaces épurées à contraste contrôlé évitant l'éblouissement",
+      "Temps de réponse rapide et micro-interactions soignées"
+    ],
+    "rules": [
+      { "name": "Mobile-First Ergonomics", "body": "Les cibles tactiles doivent respecter un minimum de 44x44px. La barre inférieure offre un accès direct au pouce.", "section": "layout" },
+      { "name": "One Accent For Action", "body": "Le vert émeraude (#006c4a / #059669) est réservé aux actions décisives (Recherche, Déposer, Contacter, Vérifié).", "section": "colors" },
+      { "name": "Fluid Density", "body": "Les flux d'annonces se réorganisent automatiquement de 1 colonne (mobile) à 2 (tablette) et 4 (desktop).", "section": "grid" }
+    ],
+    "dos": [
+      "Garantir la lisibilité sans zoom sur tous les smartphones (iOS et Android)",
+      "Afficher les indicateurs de confiance et de modération sur mobile et desktop",
+      "Fournir un retour visuel instantané lors des interactions (favoris, onglets)"
+    ],
+    "donts": [
+      "Ne jamais dépasser 1320px pour la grille centrale sur très grand écran",
+      "Ne jamais masquer les actions d'achat/vente sous un sous-menu caché sur mobile",
+      "Ne jamais déformer le ratio 4:3 des images de produits"
+    ]
+  }
+}
