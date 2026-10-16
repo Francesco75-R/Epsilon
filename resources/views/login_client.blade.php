@@ -195,11 +195,11 @@
                             <div class="form-row">
                                 <div class="form-group">
                                     <label class="form-label">Prénom</label>
-                                    <input class="form-input" name="firstname" type="text" placeholder="Kodjo" required>
+                                    <input class="form-input" name="prenom" type="text" placeholder="Kodjo" required>
                                 </div>
                                 <div class="form-group">
                                     <label class="form-label">Nom</label>
-                                    <input class="form-input" name="lastname" type="text" placeholder="Mensah" required>
+                                    <input class="form-input" name="nom" type="text" placeholder="Mensah" required>
                                 </div>
                             </div>
                             <div class="form-group">
@@ -220,7 +220,7 @@
                             </div>
                             <div class="form-group">
                                 <label class="form-label">Genre</label>
-                                <select class="form-input" name="ville" required style="cursor:pointer;">
+                                <select class="form-input" name="genre" required style="cursor:pointer;">
                                     <option value="">choisir un genre</option>
                                     <option value="Homme">Homme</option>
                                     <option value="Femme">Femme</option>
@@ -229,7 +229,12 @@
 
                             <div class="form-group">
                                 <label class="form-label">photo de profil</label>
-                                <input class="form-input" type="file" name="photo" id="photo" accept="image/*" required>
+                                <input class="form-input" type="file" name="profil" id="profil" accept="image/*" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Carte d'identité</label>
+                                <input class="form-input" type="file" name="carte" id="carte" accept="image/*" required>
                             </div>
 
                             <div class="form-row">
