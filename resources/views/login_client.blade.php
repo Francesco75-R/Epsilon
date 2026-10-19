@@ -126,10 +126,29 @@
         <!-- ─── CÔTÉ DROIT : FORMULAIRES UTILISATEUR ─── -->
         <div class="login-form-side">
 
+            <!-- Données Flash de Laravel pour Javascript & Toasts -->
+            @if(session('success'))
+            <div id="flash-success-message" data-message="{{ session('success') }}" style="display:none;"></div>
+            @endif
+            @if(session('error'))
+            <div id="flash-error-message" data-message="{{ session('error') }}" style="display:none;"></div>
+            @endif
+            @if(session('info'))
+            <div id="flash-info-message" data-message="{{ session('info') }}" style="display:none;"></div>
+            @endif
+            @if(isset($errors) && $errors->any())
+            <div id="flash-validation-errors" data-errors='@json($errors->all())' data-tab="{{ session('active_tab', ($errors->has('nom') || $errors->has('prenom') || $errors->has('phone') || $errors->has('carte') || $errors->has('profil') || $errors->has('password_confirmation') || old('nom') || old('prenom') ? 'signup' : 'login')) }}" style="display:none;"></div>
+            @endif
+            @if(session('active_tab'))
+            <div id="flash-active-tab" data-tab="{{ session('active_tab') }}" style="display:none;"></div>
+            @endif
+
             <div class="form-header">
                 <h3 id="form-heading">Bienvenue sur Epsilon</h3>
                 <p class="sub" id="form-subheading">Accédez à votre espace membre pour gérer vos annonces</p>
             </div>
+
+
 
             <div class="tabs-container">
                 <div class="tabs">
@@ -144,28 +163,29 @@
 
                     <!-- FORMULAIRE 1 : CONNEXION UTILISATEUR -->
                     <div class="form-panel panel-login" id="panel-login">
-                        <form id="form-login" action="{{ route('login') }}" method="POST">
+                        <form id="form-login" action="{{ route('login.post') }}" method="POST">
                             @csrf
 
                             <div class="form-group">
-                                <label class="form-label">Email ou Numéro de téléphone</label>
+                                <label class="form-label" for="login-identifier">Email ou Numéro de téléphone</label>
                                 <div class="input-wrapper">
                                     <span class="input-icon">✉</span>
-                                    <input class="form-input with-icon" name="login" type="text" placeholder="ex: +228 90000000 ou email" required>
+                                    <input class="form-input with-icon" id="login-identifier" name="login" type="text" placeholder="ex: +228 90000000 ou email" value="{{ old('login') }}" required>
                                 </div>
                             </div>
 
                             <div class="form-group">
-                                <label class="form-label">Mot de passe</label>
+                                <label class="form-label" for="login-password">Mot de passe</label>
                                 <div class="input-wrapper">
                                     <span class="input-icon">🔒</span>
-                                    <input class="form-input with-icon" id="login-password" name="password" type="password" placeholder="••••••••" required>
+                                    <input class="form-input with-icon has-toggle" id="login-password" name="password" type="password" placeholder="••••••••" required autocomplete="current-password">
+                                    <button type="button" class="btn-toggle-pw" onclick="togglePassword('login-password', this, event)" title="Afficher ou masquer le mot de passe" tabindex="-1">👁</button>
                                 </div>
                             </div>
 
                             <div class="form-options">
                                 <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
-                                    <input type="checkbox" name="remember"> Rester connecté
+                                    <input type="checkbox" name="remember" {{ old('remember') ? 'checked' : '' }}> Rester connecté
                                 </label>
                                 <div class="form-forgot">
                                     <a href="#">Mot de passe oublié ?</a>
@@ -189,62 +209,87 @@
 
                     <!-- FORMULAIRE 2 : INSCRIPTION MEMBRE / PRO -->
                     <div class="form-panel panel-signup inactive" id="panel-signup">
-                        <form id="form-signup" action="" method="POST">
+                        <form id="form-signup" action="{{ route('insert_client.store') }}" method="POST" enctype="multipart/form-data" onsubmit="return verifpassword(event)">
                             @csrf
 
                             <div class="form-row">
                                 <div class="form-group">
-                                    <label class="form-label">Prénom</label>
-                                    <input class="form-input" name="prenom" type="text" placeholder="Kodjo" required>
+                                    <label class="form-label" for="signup-prenom">Prénom</label>
+                                    <input class="form-input" id="signup-prenom" name="prenom" type="text" placeholder="Kodjo" value="{{ old('prenom') }}" required>
                                 </div>
                                 <div class="form-group">
-                                    <label class="form-label">Nom</label>
-                                    <input class="form-input" name="nom" type="text" placeholder="Mensah" required>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Email</label>
-                                <input type="email" class="form-input" name="email" id="email">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Numéro de Téléphone</label>
-                                <div class="input-wrapper">
-                                    <span class="input-icon">📞</span>
-                                    <input class="form-input with-icon" name="phone" type="tel" placeholder="+228 90 00 00 00" required>
+                                    <label class="form-label" for="signup-nom">Nom</label>
+                                    <input class="form-input" id="signup-nom" name="nom" type="text" placeholder="Mensah" value="{{ old('nom') }}" required>
                                 </div>
                             </div>
 
                             <div class="form-group">
-                                <label class="form-label">Adresse</label>
-                                <input class="form-input" type="text" name="adresse" id="adresse" require>
+                                <label class="form-label" for="signup-email">Email</label>
+                                <div class="input-wrapper">
+                                    <span class="input-icon">✉</span>
+                                    <input type="email" class="form-input with-icon" name="email" id="signup-email" placeholder="votre-email@domaine.com" value="{{ old('email') }}" required>
+                                </div>
                             </div>
+
                             <div class="form-group">
-                                <label class="form-label">Genre</label>
-                                <select class="form-input" name="genre" required style="cursor:pointer;">
-                                    <option value="">choisir un genre</option>
-                                    <option value="Homme">Homme</option>
-                                    <option value="Femme">Femme</option>
+                                <label class="form-label" for="signup-phone">Numéro de Téléphone</label>
+                                <div class="input-wrapper">
+                                    <span class="input-icon">📞</span>
+                                    <input class="form-input with-icon" id="signup-phone" name="phone" type="tel" placeholder="+228 90 00 00 00" value="{{ old('phone') }}" required>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="signup-adresse">Adresse ou Quartier</label>
+                                <input class="form-input" type="text" name="adresse" id="signup-adresse" placeholder="Lomé - Tokoin, Hédzranawoé..." value="{{ old('adresse') }}" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="signup-genre">Genre</label>
+                                <select class="form-input" name="genre" id="signup-genre" required style="cursor:pointer;">
+                                    <option value="">Choisir un genre</option>
+                                    <option value="Homme" {{ old('genre') == 'Homme' ? 'selected' : '' }}>Homme</option>
+                                    <option value="Femme" {{ old('genre') == 'Femme' ? 'selected' : '' }}>Femme</option>
                                 </select>
                             </div>
 
                             <div class="form-group">
-                                <label class="form-label">photo de profil</label>
-                                <input class="form-input" type="file" name="profil" id="profil" accept="image/*" required>
+                                <label class="form-label" for="profil">Photo de profil</label>
+                                <input class="form-input" type="file" name="profil" id="profil" accept="image/jpeg,image/png,image/jpg,image/webp" required>
+                                <small style="font-size:0.75rem; color:var(--slate);">JPG, PNG ou WEBP (Max: 7 Mo)</small>
                             </div>
 
                             <div class="form-group">
-                                <label class="form-label">Carte d'identité</label>
-                                <input class="form-input" type="file" name="carte" id="carte" accept="image/*" required>
+                                <label class="form-label" for="carte">Carte d'identité (CNI / Passeport / Permis)</label>
+                                <input class="form-input" type="file" name="carte" id="carte" accept="image/jpeg,image/png,image/jpg,image/webp" required>
+                                <small style="font-size:0.75rem; color:var(--slate);">Pour la vérification et le badge de confiance vendeur</small>
                             </div>
 
                             <div class="form-row">
                                 <div class="form-group">
-                                    <label class="form-label">Mot de passe</label>
-                                    <input class="form-input" name="password" type="password" placeholder="8+ car." required minlength="8">
+                                    <label class="form-label" for="signup-password">Mot de passe</label>
+                                    <div class="input-wrapper">
+                                        <input class="form-input has-toggle" id="signup-password" name="password" type="password" placeholder="8+ caractères" required minlength="8" oninput="checkPasswordStrength(this.value); checkPasswordMatch();">
+                                        <button type="button" class="btn-toggle-pw" onclick="togglePassword('signup-password', this, event)" title="Afficher ou masquer" tabindex="-1">👁</button>
+                                    </div>
                                 </div>
                                 <div class="form-group">
-                                    <label class="form-label">Confirmer</label>
-                                    <input class="form-input" name="password_confirmation" type="password" placeholder="Répéter" required minlength="8">
+                                    <label class="form-label" for="signup-confirm">Confirmer</label>
+                                    <div class="input-wrapper">
+                                        <input class="form-input has-toggle" id="signup-confirm" name="password_confirmation" type="password" placeholder="Répéter" required minlength="8" oninput="checkPasswordMatch();">
+                                        <button type="button" class="btn-toggle-pw" onclick="togglePassword('signup-confirm', this, event)" title="Afficher ou masquer" tabindex="-1">👁</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Jauge de sécurité du mot de passe -->
+                            <div class="strength-container" style="margin-top:-6px; margin-bottom:12px;">
+                                <div class="strength-bar">
+                                    <div id="strength-fill" class="strength-fill"></div>
+                                </div>
+                                <div class="strength-meta">
+                                    <span id="strength-label" class="strength-label">Entrez au moins 8 caractères</span>
+                                    <span id="pw-match-badge" class="pw-match-badge"></span>
                                 </div>
                             </div>
 

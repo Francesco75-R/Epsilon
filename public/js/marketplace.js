@@ -107,3 +107,19 @@ window.toggleFav = toggleFav;
 window.filterCategory = filterCategory;
 window.toggleMobileSearch = toggleMobileSearch;
 window.showToast = showToast;
+
+// Fermeture du dropdown profil lors d'un clic en dehors
+window.addEventListener('click', (e) => {
+    const userMenu = document.getElementById('user-menu-wrapper');
+    const userDropdown = document.getElementById('user-dropdown-menu');
+    if (userMenu && userDropdown && !userMenu.contains(e.target)) {
+        userDropdown.classList.add('hidden');
+    }
+
+    const indexMenu = document.getElementById('user-menu-wrapper-index');
+    const indexDropdown = document.getElementById('user-dropdown-index');
+    if (indexMenu && indexDropdown && !indexMenu.contains(e.target)) {
+        indexDropdown.classList.add('hidden');
+    }
+});
+

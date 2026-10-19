@@ -3,11 +3,27 @@
 <!-- ================================================================= -->
 <header class="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-xl border-b border-slate-200/80 shadow-[0_1px_12px_rgba(15,23,42,0.04)]">
     <div class="h-20 max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4 lg:gap-6">
-        
+
         <!-- 1. GAUCHE: Logo officiel Epsilon & Navigation desktop -->
         <div class="flex items-center gap-6 lg:gap-8 flex-shrink-0">
             <!-- Logo & Marque -->
             <a class="flex items-center gap-3 group" href="{{ url('/') }}" aria-label="Epsilon Accueil">
+                <svg class="h-8 w-auto object-contain" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Fond Bleu Marine -->
+                    <rect width="100" height="100" rx="24" fill="#0A1128" />
+
+                    <!-- Lettre E en Blanc -->
+                    <path d="M30 35H66C66 35 66 35 66 35C66 37.7614 63.7614 40 61 40H44V49H57C59.7614 49 62 51.2386 62 54C62 56.7614 59.7614 59 57 59H44V68H66C68.7614 68 71 70.2386 71 73C71 75.7614 68.7614 78 66 78H35C31.134 78 28 74.866 28 71V40C28 37.2386 30 35 30 35Z" fill="#FFFFFF" />
+
+                    <!-- Pastille Verte -->
+                    <circle cx="70" cy="35" r="11" fill="#10B981" />
+
+                    <!-- Flèche Verte -->
+                    <g transform="translate(52, 47)">
+                        <path d="M0 7H15" stroke="#10B981" stroke-width="5" stroke-linecap="round" />
+                        <path d="M10 2L15 7L10 12" stroke="#10B981" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" />
+                    </g>
+                </svg>
                 <div class="flex flex-col">
                     <span class="font-extrabold text-2xl tracking-tight text-primary leading-none">Epsilon</span>
                     <span class="text-[10px] font-semibold text-secondary uppercase tracking-widest leading-tight mt-0.5">Marketplace</span>
@@ -98,12 +114,64 @@
                 <span>Déposer une annonce</span>
             </a>
 
-            <!-- Avatar profil utilisateur -->
-            <a class="flex items-center pl-1 group" href="#" title="Mon Compte" aria-label="Mon Compte">
-                <div class="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-white shadow-sm ring-2 ring-slate-100 group-hover:ring-secondary/40 transition-all">
-                    <span class="material-symbols-outlined text-[20px]">person</span>
+            <!-- Avatar profil utilisateur avec photo réelle via son ID -->
+            @php
+            $clientId = Auth::id();
+            $client = $client ?? ($clientId ? \App\Models\User::find($clientId) : null);
+            @endphp
+
+            @if($client)
+            <div class="relative group" id="user-menu-wrapper">
+                <button type="button" class="flex items-center gap-2 pl-1 group cursor-pointer focus:outline-none" onclick="document.getElementById('user-dropdown-menu').classList.toggle('hidden')" aria-label="Menu Mon Compte">
+                    @if($client->photo && file_exists(public_path($client->photo)))
+                    <img src="{{ asset($client->photo) }}" alt="{{ $client->prenom }}" class="w-9 h-9 rounded-full object-cover shadow-sm ring-2 ring-secondary group-hover:ring-secondary/70 transition-all">
+                    @else
+                    <div class="w-9 h-9 rounded-full bg-secondary flex items-center justify-center text-white font-bold text-sm shadow-sm ring-2 ring-slate-100 group-hover:ring-secondary/40 transition-all">
+                        {{ strtoupper(substr($client->prenom ?? 'U', 0, 1)) }}
+                    </div>
+                    @endif
+                    <span class="hidden lg:inline text-xs font-semibold text-slate-700 max-w-[100px] truncate">{{ $client->prenom }}</span>
+                    <span class="material-symbols-outlined text-[16px] text-slate-400 group-hover:text-slate-600 transition-transform">expand_more</span>
+                </button>
+
+                <!-- Dropdown Profil -->
+                <div id="user-dropdown-menu" class="hidden absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-slate-100 py-2 z-50 transition-all">
+                    <div class="px-4 py-3 border-b border-slate-100 flex items-center gap-3">
+                        @if($client->photo && file_exists(public_path($client->photo)))
+                        <img src="{{ asset($client->photo) }}" alt="{{ $client->prenom }}" class="w-10 h-10 rounded-full object-cover ring-2 ring-secondary/30">
+                        @else
+                        <div class="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-white font-bold text-base">
+                            {{ strtoupper(substr($client->prenom ?? 'U', 0, 1)) }}
+                        </div>
+                        @endif
+                        <div class="flex-1 overflow-hidden">
+                            <p class="text-xs font-bold text-slate-800 truncate">{{ $client->prenom }} {{ $client->nom }}</p>
+                            <p class="text-[11px] text-slate-500 truncate">{{ $client->email }}</p>
+                        </div>
+                    </div>
+                    <a href="{{ route('page_client') }}" class="flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-secondary transition-colors">
+                        <span class="material-symbols-outlined text-[18px]">account_circle</span>
+                        <span>Mon Profil</span>
+                    </a>
+                    <a href="{{ route('page_client') }}" class="flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-secondary transition-colors">
+                        <span class="material-symbols-outlined text-[18px]">door_open</span>
+                        <span>Mon Espace</span>
+                    </a>
+                    <form action="{{ route('logout') }}" method="POST" class="border-t border-slate-100 mt-1 pt-1">
+                        @csrf
+                        <button type="submit" class="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-semibold text-red-600 hover:bg-red-50 transition-colors text-left cursor-pointer">
+                            <span class="material-symbols-outlined text-[18px]">logout</span>
+                            <span>Déconnexion</span>
+                        </button>
+                    </form>
                 </div>
+            </div>
+            @else
+            <a class="inline-flex items-center gap-2 bg-secondary hover:bg-on-secondary-container text-white font-bold text-sm px-4 py-2.5 rounded-xl shadow-md hover:shadow-lg transition-all" href="{{ route('login') }}" title="Se connecter">
+                <span class="material-symbols-outlined text-[20px]">person</span>
+                <span>Se connecter</span>
             </a>
+            @endif
         </div>
     </div>
 
@@ -118,3 +186,13 @@
         </div>
     </div>
 </header>
+
+<script>
+    document.addEventListener('click', function(event) {
+        const wrapper = document.getElementById('user-menu-wrapper');
+        const menu = document.getElementById('user-dropdown-menu');
+        if (menu && wrapper && !wrapper.contains(event.target)) {
+            menu.classList.add('hidden');
+        }
+    });
+</script>

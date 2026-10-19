@@ -95,9 +95,9 @@
             <button class="md:hidden p-2.5 rounded-xl hover:bg-slate-100 text-slate-600 transition-colors flex items-center justify-center" type="button" onclick="toggleMobileSearch()" aria-label="Ouvrir la recherche mobile">
                 <span class="material-symbols-outlined text-[22px]">search</span>
             </button>
-            <a class="hidden sm:inline-flex items-center gap-2 bg-secondary hover:bg-[#0A1128] text-white font-bold text-sm px-4 py-2.5 rounded-xl shadow-md hover:shadow-lg transition-all duration-200 ease-out hover:scale-105 active:scale-95" href="{{ route('login') }}" title="Se connecter">
+            <a class="inline-flex items-center gap-2 bg-secondary hover:bg-[#0A1128] text-white font-bold text-sm px-4 py-2.5 rounded-xl shadow-md hover:shadow-lg transition-all duration-200 ease-out hover:scale-105 active:scale-95" href="{{ route('login') }}" title="Se connecter">
                 <span class="material-symbols-outlined text-[20px]">person</span>
-                <span>Connexion</span>
+                <span>Se connecter</span>
             </a>
         </div>
     </div>
