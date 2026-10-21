@@ -44,12 +44,12 @@
             </nav>
         </div>
 
-        <!-- 2. CENTRE: Barre de recherche intégrée (Desktop & Tablette) -->
-        <div class="hidden md:flex flex-1 max-w-2xl items-center bg-slate-100/90 hover:bg-slate-100/100 rounded-2xl p-1.5 shadow-[0_1px_3px_rgba(15,23,42,0.04)] border border-slate-200/80 transition-all focus-within:border-secondary focus-within:bg-white focus-within:ring-2 focus-within:ring-secondary/20">
+        <!-- 2. CENTRE: Barre de recherche intégrée (Desktop & Tablette - 100% Opérationnelle) -->
+        <form action="{{ route('home') }}" method="GET" class="hidden md:flex flex-1 max-w-2xl items-center bg-slate-100/90 hover:bg-slate-100/100 rounded-2xl p-1.5 shadow-[0_1px_3px_rgba(15,23,42,0.04)] border border-slate-200/80 transition-all focus-within:border-secondary focus-within:bg-white focus-within:ring-2 focus-within:ring-secondary/20">
             <!-- Champ recherche textuelle -->
             <div class="flex items-center flex-1 px-3">
                 <span class="material-symbols-outlined text-slate-400 text-[20px] mr-2">search</span>
-                <input id="header-search-input" class="w-full bg-transparent border-none outline-none text-sm text-slate-900 placeholder:text-slate-400" placeholder="Que recherchez-vous ?" type="text" onkeyup="if(event.key === 'Enter') { document.getElementById('listing-feed')?.scrollIntoView({behavior: 'smooth'}); }" />
+                <input id="header-search-input" name="q" value="{{ request('q') }}" class="w-full bg-transparent border-none outline-none text-sm text-slate-900 placeholder:text-slate-400" placeholder="Que recherchez-vous ? (ex: Toyota, iPhone...)" type="text" />
             </div>
 
             <!-- Séparateur vertical -->
@@ -57,13 +57,13 @@
 
             <!-- Sélecteur de catégorie -->
             <div class="flex items-center px-2">
-                <select class="bg-transparent border-none outline-none text-xs font-medium text-slate-600 cursor-pointer pr-2 hover:text-primary transition-colors" aria-label="Catégories">
+                <select name="categorie" class="bg-transparent border-none outline-none text-xs font-medium text-slate-600 cursor-pointer pr-2 hover:text-primary transition-colors" aria-label="Catégories">
                     <option value="">Toutes catégories</option>
-                    <option value="vehicules">Véhicules</option>
-                    <option value="immo">Immobilier</option>
-                    <option value="tech">Smartphones & Tech</option>
-                    <option value="maison">Mode & Maison</option>
-                    <option value="services">Emploi & Services</option>
+                    <option value="Véhicules" {{ request('categorie') == 'Véhicules' ? 'selected' : '' }}>Véhicules</option>
+                    <option value="Immobilier" {{ request('categorie') == 'Immobilier' ? 'selected' : '' }}>Immobilier</option>
+                    <option value="Smartphones & Tech" {{ request('categorie') == 'Smartphones & Tech' ? 'selected' : '' }}>Smartphones & Tech</option>
+                    <option value="Mode & Maison" {{ request('categorie') == 'Mode & Maison' ? 'selected' : '' }}>Mode & Maison</option>
+                    <option value="Emploi & Services" {{ request('categorie') == 'Emploi & Services' ? 'selected' : '' }}>Emploi & Services</option>
                 </select>
             </div>
 
@@ -73,21 +73,21 @@
             <!-- Sélecteur de localisation -->
             <div class="flex items-center px-2">
                 <span class="material-symbols-outlined text-slate-400 text-[18px] mr-1">location_on</span>
-                <select class="bg-transparent border-none outline-none text-xs font-medium text-slate-600 cursor-pointer hover:text-primary transition-colors" aria-label="Localisation">
+                <select name="lieu" class="bg-transparent border-none outline-none text-xs font-medium text-slate-600 cursor-pointer hover:text-primary transition-colors" aria-label="Localisation">
                     <option value="">Tout le Togo</option>
-                    <option value="lome">Lomé</option>
-                    <option value="kara">Kara</option>
-                    <option value="sokode">Sokodé</option>
-                    <option value="kpalime">Kpalimé</option>
-                    <option value="atakpame">Atakpamé</option>
+                    <option value="Lomé" {{ request('lieu') == 'Lomé' ? 'selected' : '' }}>Lomé</option>
+                    <option value="Kara" {{ request('lieu') == 'Kara' ? 'selected' : '' }}>Kara</option>
+                    <option value="Sokodé" {{ request('lieu') == 'Sokodé' ? 'selected' : '' }}>Sokodé</option>
+                    <option value="Kpalimé" {{ request('lieu') == 'Kpalimé' ? 'selected' : '' }}>Kpalimé</option>
+                    <option value="Atakpamé" {{ request('lieu') == 'Atakpamé' ? 'selected' : '' }}>Atakpamé</option>
                 </select>
             </div>
 
-            <!-- Bouton de validation de recherche -->
-            <button class="flex items-center justify-center bg-secondary hover:bg-on-secondary-container text-white p-2.5 rounded-xl shadow-sm hover:scale-105 transition-all ml-1 flex-shrink-0 cursor-pointer" type="button" onclick="document.getElementById('listing-feed')?.scrollIntoView({behavior: 'smooth'})" aria-label="Lancer la recherche">
+            <!-- Bouton de validation de recherche (Loupe) -->
+            <button type="submit" class="flex items-center justify-center bg-secondary hover:bg-on-secondary-container text-white p-2.5 rounded-xl shadow-sm hover:scale-105 transition-all ml-1 flex-shrink-0 cursor-pointer" aria-label="Lancer la recherche">
                 <span class="material-symbols-outlined text-[19px]">search</span>
             </button>
-        </div>
+        </form>
 
         <!-- 3. DROITE: Actions utilisateur, Favoris, Messagerie, Bouton CTA & Profil -->
         <div class="flex items-center gap-2.5 sm:gap-3 flex-shrink-0">
@@ -109,7 +109,7 @@
             </a>
 
             <!-- Bouton Déposer une annonce (CTA mis en valeur) -->
-            <a class="hidden sm:inline-flex items-center gap-2 bg-secondary hover:bg-on-secondary-container text-white font-bold text-sm px-4 py-2.5 rounded-xl shadow-md hover:shadow-lg transition-all" href="#" title="Déposer une annonce">
+            <a class="hidden sm:inline-flex items-center gap-2 bg-secondary hover:bg-on-secondary-container text-white font-bold text-sm px-4 py-2.5 rounded-xl shadow-md hover:shadow-lg transition-all" href="{{ route('dashboard', ['tab' => 'publier']) }}" title="Déposer une annonce">
                 <span class="material-symbols-outlined text-[20px]">add_circle</span>
                 <span>Déposer une annonce</span>
             </a>
@@ -149,13 +149,17 @@
                             <p class="text-[11px] text-slate-500 truncate">{{ $client->email }}</p>
                         </div>
                     </div>
-                    <a href="{{ route('page_client') }}" class="flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-secondary transition-colors">
-                        <span class="material-symbols-outlined text-[18px]">account_circle</span>
-                        <span>Mon Profil</span>
+                    <a href="{{ route('dashboard') }}" class="flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-secondary transition-colors">
+                        <span class="material-symbols-outlined text-[18px]">dashboard</span>
+                        <span>Mon Espace Membre</span>
+                    </a>
+                    <a href="{{ route('dashboard', ['tab' => 'mes-annonces']) }}" class="flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-secondary transition-colors">
+                        <span class="material-symbols-outlined text-[18px]">inventory_2</span>
+                        <span>Mes Annonces</span>
                     </a>
                     <a href="{{ route('page_client') }}" class="flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-secondary transition-colors">
-                        <span class="material-symbols-outlined text-[18px]">door_open</span>
-                        <span>Mon Espace</span>
+                        <span class="material-symbols-outlined text-[18px]">account_circle</span>
+                        <span>Profil Public Vendeur</span>
                     </a>
                     <form action="{{ route('logout') }}" method="POST" class="border-t border-slate-100 mt-1 pt-1">
                         @csrf
@@ -177,13 +181,13 @@
 
     <!-- Tiroir de recherche pour mobile (< 768px) -->
     <div id="mobile-search-bar" class="hidden md:hidden px-4 py-3 bg-slate-50 border-t border-slate-200">
-        <div class="flex items-center bg-white rounded-xl p-2 shadow-sm border border-slate-200">
+        <form action="{{ route('home') }}" method="GET" class="flex items-center bg-white rounded-xl p-2 shadow-sm border border-slate-200">
             <span class="material-symbols-outlined text-slate-400 text-[20px] mr-2">search</span>
-            <input class="w-full bg-transparent border-none outline-none text-sm text-slate-900 placeholder:text-slate-400" placeholder="Rechercher sur Epsilon..." type="text" onkeyup="if(event.key === 'Enter') { setSearchTerm(this.value); document.getElementById('listing-feed')?.scrollIntoView({behavior: 'smooth'}); }" />
-            <button class="bg-secondary text-white p-2 rounded-lg flex-shrink-0 ml-1.5" type="button" onclick="document.getElementById('listing-feed')?.scrollIntoView({behavior: 'smooth'})">
+            <input name="q" value="{{ request('q') }}" class="w-full bg-transparent border-none outline-none text-sm text-slate-900 placeholder:text-slate-400" placeholder="Rechercher sur Epsilon..." type="text" />
+            <button type="submit" class="bg-secondary text-white p-2 rounded-lg flex-shrink-0 ml-1.5" aria-label="Valider">
                 <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
             </button>
-        </div>
+        </form>
     </div>
 </header>
 

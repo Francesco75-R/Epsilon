@@ -52,4 +52,12 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    /**
+     * Les annonces publiées par l'utilisateur.
+     */
+    public function annonces()
+    {
+        return $this->hasMany(Annonce::class);
+    }
 }

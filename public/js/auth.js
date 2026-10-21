@@ -238,7 +238,7 @@ function showToast(type, title, message) {
             <div class="toast-title">${title}</div>
             <div class="toast-desc">${message}</div>
         </div>
-        <button type="button" class="toast-close" aria-label="Fermer la notification">×</button>
+        <button type="button" class="toast-close" aria-label="Fermer la notification">✕</button>
         <div class="toast-progress"><div class="toast-progress-bar"></div></div>
     `;
 

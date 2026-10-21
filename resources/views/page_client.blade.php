@@ -1,6 +1,13 @@
 @extends('layouts.acueil')
 
-@section('title', 'Epsilon Marketplace | Bienvenue à Epsilon')
+@php
+$client = $client ?? (Auth::user() ?? new \App\Models\User(['prenom' => 'Vendeur', 'nom' => 'Epsilon']));
+$annonces = $annonces ?? collect();
+$totalCount = $totalCount ?? $annonces->count();
+$showAll = $showAll ?? false;
+@endphp
+
+@section('title', 'Boutique de ' . ($client->prenom ?? 'Vendeur') . ' ' . ($client->nom ?? '') . ' | Epsilon Marketplace')
 
 @section('content')
 <div class="flex flex-col w-full">
@@ -252,293 +259,106 @@
                 <!-- Grille des produits optimisée : Cartes agrandies, espacement aéré (gap-6 à gap-8) -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
 
-                    <!-- Carte 1: Toyota RAV4 -->
-                    <div class="listing-item product-card group bg-white rounded-2xl border border-slate-200/80 hover:border-secondary/40 shadow-[0_2px_12px_rgba(15,23,42,0.04)] hover:shadow-[0_16px_32px_rgba(15,23,42,0.09)] transition-all duration-300 hover:-translate-y-1.5 flex flex-col overflow-hidden" data-cat="vehicules">
-                        <!-- Image agrandie -->
+                    @forelse($annonces as $ad)
+                    @php
+                    $catLower = strtolower(trim($ad->categorie ?? ''));
+                    $catSlug = match(true) {
+                    str_contains($catLower, 'véhicule') || str_contains($catLower, 'vehicule') || str_contains($catLower, 'auto') || str_contains($catLower, 'moto') => 'vehicules',
+                    str_contains($catLower, 'immo') => 'immo',
+                    str_contains($catLower, 'tech') || str_contains($catLower, 'infor') || str_contains($catLower, 'téléphon') || str_contains($catLower, 'électro') => 'tech',
+                    str_contains($catLower, 'maison') || str_contains($catLower, 'mode') || str_contains($catLower, 'meuble') => 'maison',
+                    default => 'services'
+                    };
+
+                    $photos = is_array($ad->photos) ? $ad->photos : (is_string($ad->photos) ? json_decode($ad->photos, true) ?? [] : []);
+                    $cover = !empty($photos) ? $photos[0] : null;
+                    $coverUrl = $cover ? (str_starts_with($cover, 'http') ? $cover : asset($cover)) : asset('photo/default.png');
+                    $photoCount = count($photos);
+                    @endphp
+
+                    <div class="listing-item product-card group bg-white rounded-2xl border border-slate-200/80 hover:border-secondary/40 shadow-[0_2px_12px_rgba(15,23,42,0.04)] hover:shadow-[0_16px_32px_rgba(15,23,42,0.09)] transition-all duration-300 hover:-translate-y-1.5 flex flex-col overflow-hidden" data-cat="{{ $catSlug }}">
+                        <!-- Image / Vignette (Uniquement photos[0]) -->
                         <div class="relative w-full h-56 sm:h-52 md:h-60 overflow-hidden bg-slate-100">
-                            <img class="product-card-img w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out" alt="Toyota RAV4 2021 AWD Boîte Auto" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAodb_3vGNYkwNoDN9jLWqta21OPu6w17feuzjNl_fAWfHdU8F4_hBWLp2P5uuLQdMUpv4SyfL4UU45X_IuUxAnz7bsyjbY4gh1-0C1bKqTJVy_55-DlxwDlRCR6KWtM3CZ3-ryAic7gH9mB6ulAcAIPJMvHnIWsG6ahnBuRsOlNvCg07hy--lwRgLCV2HQvoOfwtMzy0BEuYOOBgfNQjxf6eoR849xWaqig60M_YA2qFFfZL7X83wv" loading="lazy" />
-                            <div class="absolute top-3 left-3 flex gap-2">
-                                <span class="bg-secondary text-white px-3 py-1 rounded-lg text-xs font-bold shadow-sm flex items-center gap-1">
-                                    <span class="material-symbols-outlined text-[14px]">bolt</span> Sponsorisé
+                            <img class="product-card-img w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out cursor-pointer"
+                                alt="{{ $ad->titre }}"
+                                src="{{ $coverUrl }}"
+                                data-photos="{{ e(json_encode($photos)) }}"
+                                data-titre="{{ $ad->titre }}"
+                                onclick="openGalleryFromElement(this)"
+                                loading="lazy" />
+
+                            <div class="absolute top-3 left-3 flex flex-wrap gap-1.5">
+                                <span class="bg-secondary text-white px-2.5 py-1 rounded-lg text-xs font-bold shadow-sm flex items-center gap-1">
+                                    {{ $ad->categorie }}
                                 </span>
                                 <span class="bg-white/95 backdrop-blur-md text-primary px-2.5 py-1 rounded-lg text-xs font-semibold shadow-sm">
-                                    Occasion
+                                    {{ $ad->etat }}
                                 </span>
                             </div>
-                            <button class="fav-btn absolute top-3 right-3 w-9 h-9 rounded-full bg-white/90 backdrop-blur-md hover:bg-white flex items-center justify-center text-slate-500 hover:text-error transition-all shadow-sm hover:scale-110 cursor-pointer" onclick="toggleFav(this)" title="Ajouter aux favoris">
-                                <span class="material-symbols-outlined text-[20px]">favorite</span>
-                            </button>
-                        </div>
-                        <!-- Contenu interne avec espacement amélioré (p-5 / p-6) -->
-                        <div class="p-5 md:p-6 flex flex-col flex-1 justify-between gap-3">
-                            <div>
-                                <span class="text-xs font-semibold text-secondary uppercase tracking-wider block mb-1">Véhicules</span>
-                                <h3 class="text-base sm:text-lg font-bold text-primary line-clamp-1 group-hover:text-secondary transition-colors">
-                                    Toyota RAV4 2021 AWD Boîte Auto
-                                </h3>
-                                <div class="flex items-baseline gap-1 mt-2">
-                                    <span class="text-xl sm:text-2xl font-extrabold text-secondary tracking-tight">16 500 000</span>
-                                    <span class="text-xs font-bold text-slate-500">FCFA</span>
-                                </div>
-                            </div>
-                            <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs sm:text-sm text-slate-500">
-                                <span class="flex items-center gap-1.5 truncate">
-                                    <span class="material-symbols-outlined text-[16px] text-slate-400">location_on</span> Lomé, Agoè
-                                </span>
-                                <span class="inline-flex items-center gap-1 font-semibold text-secondary bg-secondary-container/30 px-2 py-0.5 rounded text-xs">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-secondary"></span> Pro
-                                </span>
-                            </div>
-                        </div>
-                    </div>
 
-                    <!-- Carte 2: iPhone 15 Pro Max -->
-                    <div class="listing-item product-card group bg-white rounded-2xl border border-slate-200/80 hover:border-secondary/40 shadow-[0_2px_12px_rgba(15,23,42,0.04)] hover:shadow-[0_16px_32px_rgba(15,23,42,0.09)] transition-all duration-300 hover:-translate-y-1.5 flex flex-col overflow-hidden" data-cat="tech">
-                        <!-- Image agrandie -->
-                        <div class="relative w-full h-56 sm:h-52 md:h-60 overflow-hidden bg-slate-100">
-                            <img class="product-card-img w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out" alt="iPhone 15 Pro Max 256GB Titane" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC5E5-OmSho5aQXPxZGBor15KdAcX2nNwcHF-omlpF9RO6DYeFgxdJhF-SJt-b8XSi5ge1p2KcMmqrpFc7bpmZAYx7C4UkcqfHowA3wFcy1tMmTa6zyXmlCdB3Q0hTpxoZnfi78FzYCJleYJnHgXGp0_okG716OHcPwmYWpem7reygKYIQHWNLjR3ckCJbjPux8MzUVOMfs9WJat7AGGc1y_SXJLXijWvfAsEIEXIJM0kaDYTIvSc5w" loading="lazy" />
-                            <div class="absolute top-3 left-3 flex gap-2">
-                                <span class="bg-error text-white px-3 py-1 rounded-lg text-xs font-bold shadow-sm flex items-center gap-1">
-                                    <span class="material-symbols-outlined text-[14px]">alarm</span> Urgent
-                                </span>
-                                <span class="bg-white/95 backdrop-blur-md text-primary px-2.5 py-1 rounded-lg text-xs font-semibold shadow-sm">
-                                    Neuf
-                                </span>
-                            </div>
+                            <!-- Bouton Favoris -->
                             <button class="fav-btn absolute top-3 right-3 w-9 h-9 rounded-full bg-white/90 backdrop-blur-md hover:bg-white flex items-center justify-center text-slate-500 hover:text-error transition-all shadow-sm hover:scale-110 cursor-pointer" onclick="toggleFav(this)" title="Ajouter aux favoris">
                                 <span class="material-symbols-outlined text-[20px]">favorite</span>
                             </button>
+
+                            <!-- Bouton Photos (Exigence: Petit lien/bouton nommé "Photos" qui ouvre la modale galerie) -->
+                            <button type="button"
+                                data-photos="{{ e(json_encode($photos)) }}"
+                                data-titre="{{ $ad->titre }}"
+                                onclick="openGalleryFromElement(this)"
+                                class="absolute bottom-3 right-3 bg-slate-900/85 hover:bg-secondary text-white text-xs font-bold px-3 py-1.5 rounded-xl backdrop-blur-md shadow-md inline-flex items-center gap-1.5 transition-all cursor-pointer hover:scale-105">
+                                <span class="material-symbols-outlined text-[16px] text-secondary-fixed">photo_library</span>
+                                <span>Photos ({{ $photoCount }})</span>
+                            </button>
                         </div>
+
                         <!-- Contenu interne avec espacement amélioré -->
                         <div class="p-5 md:p-6 flex flex-col flex-1 justify-between gap-3">
                             <div>
-                                <span class="text-xs font-semibold text-secondary uppercase tracking-wider block mb-1">High-Tech</span>
-                                <h3 class="text-base sm:text-lg font-bold text-primary line-clamp-1 group-hover:text-secondary transition-colors">
-                                    iPhone 15 Pro Max 256GB Titane
+                                <span class="text-xs font-semibold text-secondary uppercase tracking-wider block mb-1">
+                                    {{ $ad->categorie }}
+                                </span>
+                                <h3 class="text-base sm:text-lg font-bold text-primary line-clamp-1 group-hover:text-secondary transition-colors" title="{{ $ad->titre }}">
+                                    {{ $ad->titre }}
                                 </h3>
                                 <div class="flex items-baseline gap-1 mt-2">
-                                    <span class="text-xl sm:text-2xl font-extrabold text-secondary tracking-tight">780 000</span>
+                                    <span class="text-xl sm:text-2xl font-extrabold text-secondary tracking-tight">
+                                        {{ number_format($ad->prix, 0, ',', ' ') }}
+                                    </span>
                                     <span class="text-xs font-bold text-slate-500">FCFA</span>
                                 </div>
+                                <p class="text-xs text-on-surface-variant line-clamp-2 mt-2 leading-relaxed">
+                                    {{ $ad->description }}
+                                </p>
                             </div>
-                            <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs sm:text-sm text-slate-500">
-                                <span class="flex items-center gap-1.5 truncate">
-                                    <span class="material-symbols-outlined text-[16px] text-slate-400">location_on</span> Lomé, Tokoin
-                                </span>
-                                <span class="text-xs text-slate-400">Il y a 1h</span>
-                            </div>
-                        </div>
-                    </div>
 
-                    <!-- Carte 3: Villa duplex -->
-                    <div class="listing-item product-card group bg-white rounded-2xl border border-slate-200/80 hover:border-secondary/40 shadow-[0_2px_12px_rgba(15,23,42,0.04)] hover:shadow-[0_16px_32px_rgba(15,23,42,0.09)] transition-all duration-300 hover:-translate-y-1.5 flex flex-col overflow-hidden" data-cat="immo">
-                        <!-- Image agrandie -->
-                        <div class="relative w-full h-56 sm:h-52 md:h-60 overflow-hidden bg-slate-100">
-                            <img class="product-card-img w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out" alt="Villa duplex 5 pièces avec jardin" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCW0-PIMuH6jSyzOY-_eJUAy3tXxoCUJq7vxlOI4J3-yDpK5wuYVvKxZxjZhB6ICuPPCGjGJIQgVrd_QISmp1h7WkzHXUJwT0c1NazIGWehSg2pe7X8NhNgElRQGAw6Ik3QgKbMkjvg1A8kY9RJS1u3_lcg0iohUXnryxUt912B890gaB1s81I-oms6foF0IKo1tgIF11vU2zDNUQDXXjs8BWuEV7xg3C7udWDVSxH-NA9rU6cKMn2-" loading="lazy" />
-                            <div class="absolute top-3 left-3 flex gap-2">
-                                <span class="bg-secondary text-white px-3 py-1 rounded-lg text-xs font-bold shadow-sm flex items-center gap-1">
-                                    <span class="material-symbols-outlined text-[14px]">bolt</span> Sponsorisé
-                                </span>
-                            </div>
-                            <button class="fav-btn absolute top-3 right-3 w-9 h-9 rounded-full bg-white/90 backdrop-blur-md hover:bg-white flex items-center justify-center text-slate-500 hover:text-error transition-all shadow-sm hover:scale-110 cursor-pointer" onclick="toggleFav(this)" title="Ajouter aux favoris">
-                                <span class="material-symbols-outlined text-[20px]">favorite</span>
-                            </button>
-                        </div>
-                        <!-- Contenu interne avec espacement amélioré -->
-                        <div class="p-5 md:p-6 flex flex-col flex-1 justify-between gap-3">
-                            <div>
-                                <span class="text-xs font-semibold text-secondary uppercase tracking-wider block mb-1">Immobilier</span>
-                                <h3 class="text-base sm:text-lg font-bold text-primary line-clamp-1 group-hover:text-secondary transition-colors">
-                                    Villa duplex 5 pièces avec piscine
-                                </h3>
-                                <div class="flex items-baseline gap-1 mt-2">
-                                    <span class="text-xl sm:text-2xl font-extrabold text-primary tracking-tight">65 000 000</span>
-                                    <span class="text-xs font-bold text-slate-500">FCFA</span>
+                            <div class="pt-3 border-t border-slate-100 flex justify-between items-center w-full text-xs text-slate-500">
+                                <div class="flex items-center gap-1 truncate text-slate-600 font-medium" title="{{ $ad->lieu }}">
+                                    <span class="material-symbols-outlined text-[15px] text-slate-400">location_on</span>
+                                    <span class="truncate">{{ $ad->lieu }}</span>
                                 </div>
-                            </div>
-                            <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs sm:text-sm text-slate-500">
-                                <span class="flex items-center gap-1.5 truncate">
-                                    <span class="material-symbols-outlined text-[16px] text-slate-400">location_on</span> Baguida Plage
-                                </span>
-                                <span class="text-xs font-bold text-secondary bg-secondary-container/30 px-2 py-0.5 rounded">Vérifié</span>
+                                <div class="flex items-center gap-1 text-[11px] font-medium text-slate-400 whitespace-nowrap ml-2 flex-shrink-0" title="{{ $ad->created_at }}">
+                                    <span class="material-symbols-outlined text-[13px]">schedule</span>
+                                    <span>{{ $ad->formatted_date }}</span>
+                                </div>
                             </div>
                         </div>
                     </div>
-
-                    <!-- Carte 4: MacBook Pro M3 -->
-                    <div class="listing-item product-card group bg-white rounded-2xl border border-slate-200/80 hover:border-secondary/40 shadow-[0_2px_12px_rgba(15,23,42,0.04)] hover:shadow-[0_16px_32px_rgba(15,23,42,0.09)] transition-all duration-300 hover:-translate-y-1.5 flex flex-col overflow-hidden" data-cat="tech">
-                        <!-- Image agrandie -->
-                        <div class="relative w-full h-56 sm:h-52 md:h-60 overflow-hidden bg-slate-100">
-                            <img class="product-card-img w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out" alt="MacBook Pro 14 M3 Pro 18GB" src="https://lh3.googleusercontent.com/aida-public/AB6AXuANnywcqkUmvlYTZwgrDs4Osb0aFUL2f88G8jF2XH56CzNHewn9ZYCkWcZ9QTRSiqBMPZ1CxrnHOQejWepkjtAXPk8A4rlCU8jnwfnx323Mlizzoqq3lGShulTzaVUd4vphh_jR6LJFXllPgybJvC5wYSZ9rXHDbtxMLixNmizGUxZX0aYp-4RpAMD6FfD6QYfAG569DJCon1aBeHF46P5FZ1KLPO8QqsI2U9HpUlWZjCjTadRXbgRD" loading="lazy" />
-                            <div class="absolute top-3 left-3">
-                                <span class="bg-white/95 backdrop-blur-md text-primary px-2.5 py-1 rounded-lg text-xs font-semibold shadow-sm">
-                                    Comme neuf
-                                </span>
-                            </div>
-                            <button class="fav-btn absolute top-3 right-3 w-9 h-9 rounded-full bg-white/90 backdrop-blur-md hover:bg-white flex items-center justify-center text-slate-500 hover:text-error transition-all shadow-sm hover:scale-110 cursor-pointer" onclick="toggleFav(this)" title="Ajouter aux favoris">
-                                <span class="material-symbols-outlined text-[20px]">favorite</span>
-                            </button>
+                    @empty
+                    <div class="col-span-full py-16 px-6 text-center bg-white rounded-3xl border border-slate-200/80 shadow-sm max-w-xl mx-auto my-6">
+                        <div class="w-20 h-20 rounded-2xl bg-secondary-container/30 text-secondary flex items-center justify-center mx-auto mb-5">
+                            <span class="material-symbols-outlined text-[40px]">inventory_2</span>
                         </div>
-                        <!-- Contenu interne avec espacement amélioré -->
-                        <div class="p-5 md:p-6 flex flex-col flex-1 justify-between gap-3">
-                            <div>
-                                <span class="text-xs font-semibold text-secondary uppercase tracking-wider block mb-1">Informatique</span>
-                                <h3 class="text-base sm:text-lg font-bold text-primary line-clamp-1 group-hover:text-secondary transition-colors">
-                                    MacBook Pro 14" M3 Pro 18GB
-                                </h3>
-                                <div class="flex items-baseline gap-1 mt-2">
-                                    <span class="text-xl sm:text-2xl font-extrabold text-secondary tracking-tight">1 350 000</span>
-                                    <span class="text-xs font-bold text-slate-500">FCFA</span>
-                                </div>
-                            </div>
-                            <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs sm:text-sm text-slate-500">
-                                <span class="flex items-center gap-1.5 truncate">
-                                    <span class="material-symbols-outlined text-[16px] text-slate-400">location_on</span> Centre-Ville
-                                </span>
-                                <span class="text-xs text-slate-400">Il y a 3h</span>
-                            </div>
-                        </div>
+                        <h3 class="text-xl font-extrabold text-primary mb-2">Aucune annonce publiée pour le moment</h3>
+                        <p class="text-sm text-on-surface-variant mb-6 leading-relaxed">
+                            Soyez le premier à profiter de la marketplace Epsilon pour mettre en vente vos biens et services auprès de milliers d'acheteurs.
+                        </p>
+                        <a href="{{ route('dashboard', ['tab' => 'publier']) }}" class="inline-flex items-center gap-2 bg-secondary hover:bg-on-secondary-container text-white font-bold text-sm px-6 py-3 rounded-xl shadow-md hover:shadow-lg transition-all">
+                            <span class="material-symbols-outlined text-[20px]">add_circle</span>
+                            <span>Déposer la première annonce</span>
+                        </a>
                     </div>
-
-                    <!-- Carte 5: Salon d'angle velours -->
-                    <div class="listing-item product-card group bg-white rounded-2xl border border-slate-200/80 hover:border-secondary/40 shadow-[0_2px_12px_rgba(15,23,42,0.04)] hover:shadow-[0_16px_32px_rgba(15,23,42,0.09)] transition-all duration-300 hover:-translate-y-1.5 flex flex-col overflow-hidden" data-cat="maison">
-                        <!-- Image agrandie -->
-                        <div class="relative w-full h-56 sm:h-52 md:h-60 overflow-hidden bg-slate-100">
-                            <img class="product-card-img w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out" alt="Salon d'angle velours moderne 6 pl." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB6GGcD2BSTLPkAz0zkycry01Vqes8kghNo_xOZEwaC0tchZ8s_IjSxVfs6Tt4WLcupjX3MCB464Dk4Hz9qPGydNpHQ7pulUeTSM8ycy6j_GfEs9UGsne4lvSHR_QqLlxIGxKzxpXrxgGwpbqWTwB0p-7Vp9MI8_xcNoZobSQOH8npTo6Afr3VD4qCcuu2-IPH_mTkCA6PaTNY147mLS5lzqyl-S9iJPI3VndbpnpSqYrlL7xsfmMkE" loading="lazy" />
-                            <div class="absolute top-3 left-3">
-                                <span class="bg-white/95 backdrop-blur-md text-primary px-2.5 py-1 rounded-lg text-xs font-semibold shadow-sm">
-                                    Neuf en atelier
-                                </span>
-                            </div>
-                            <button class="fav-btn absolute top-3 right-3 w-9 h-9 rounded-full bg-white/90 backdrop-blur-md hover:bg-white flex items-center justify-center text-slate-500 hover:text-error transition-all shadow-sm hover:scale-110 cursor-pointer" onclick="toggleFav(this)" title="Ajouter aux favoris">
-                                <span class="material-symbols-outlined text-[20px]">favorite</span>
-                            </button>
-                        </div>
-                        <!-- Contenu interne avec espacement amélioré -->
-                        <div class="p-5 md:p-6 flex flex-col flex-1 justify-between gap-3">
-                            <div>
-                                <span class="text-xs font-semibold text-secondary uppercase tracking-wider block mb-1">Maison</span>
-                                <h3 class="text-base sm:text-lg font-bold text-primary line-clamp-1 group-hover:text-secondary transition-colors">
-                                    Salon d'angle velours moderne 6 pl.
-                                </h3>
-                                <div class="flex items-baseline gap-1 mt-2">
-                                    <span class="text-xl sm:text-2xl font-extrabold text-secondary tracking-tight">320 000</span>
-                                    <span class="text-xs font-bold text-slate-500">FCFA</span>
-                                </div>
-                            </div>
-                            <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs sm:text-sm text-slate-500">
-                                <span class="flex items-center gap-1.5 truncate">
-                                    <span class="material-symbols-outlined text-[16px] text-slate-400">location_on</span> Hedzranawoé
-                                </span>
-                                <span class="text-xs text-slate-400">Il y a 4h</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Carte 6: PS5 Slim Edition -->
-                    <div class="listing-item product-card group bg-white rounded-2xl border border-slate-200/80 hover:border-secondary/40 shadow-[0_2px_12px_rgba(15,23,42,0.04)] hover:shadow-[0_16px_32px_rgba(15,23,42,0.09)] transition-all duration-300 hover:-translate-y-1.5 flex flex-col overflow-hidden" data-cat="tech">
-                        <!-- Image agrandie -->
-                        <div class="relative w-full h-56 sm:h-52 md:h-60 overflow-hidden bg-slate-100">
-                            <img class="product-card-img w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out" alt="Sony PS5 Slim + 2 Manettes" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB8SBB_TaZYkJ8_MWHFOqEsgUaOPFtnqTn7AtPeCJ3cqbDDKf34pVeXT4GkaQwIk4oMVOfXy0evzXiozhmOi7k95sy63_6LTxjRvx8Yv7Cp0FSMDypSaVMxSJwbAATgz5PpKKUrYEvqXeKHAgyZUEPqA0QK_OovzZyDtqYnAxr4bJGykFtSeP7xclBLhYcqulrme4necEwCBJRfObZvqDEtWMF37LBtQEWpO_aL0avkjpnYaIOis9Qu" loading="lazy" />
-                            <div class="absolute top-3 left-3 flex gap-2">
-                                <span class="bg-error text-white px-3 py-1 rounded-lg text-xs font-bold shadow-sm flex items-center gap-1">
-                                    <span class="material-symbols-outlined text-[14px]">alarm</span> Urgent
-                                </span>
-                            </div>
-                            <button class="fav-btn absolute top-3 right-3 w-9 h-9 rounded-full bg-white/90 backdrop-blur-md hover:bg-white flex items-center justify-center text-slate-500 hover:text-error transition-all shadow-sm hover:scale-110 cursor-pointer" onclick="toggleFav(this)" title="Ajouter aux favoris">
-                                <span class="material-symbols-outlined text-[20px]">favorite</span>
-                            </button>
-                        </div>
-                        <!-- Contenu interne avec espacement amélioré -->
-                        <div class="p-5 md:p-6 flex flex-col flex-1 justify-between gap-3">
-                            <div>
-                                <span class="text-xs font-semibold text-secondary uppercase tracking-wider block mb-1">Gaming</span>
-                                <h3 class="text-base sm:text-lg font-bold text-primary line-clamp-1 group-hover:text-secondary transition-colors">
-                                    Sony PS5 Slim + 2 Manettes
-                                </h3>
-                                <div class="flex items-baseline gap-1 mt-2">
-                                    <span class="text-xl sm:text-2xl font-extrabold text-secondary tracking-tight">390 000</span>
-                                    <span class="text-xs font-bold text-slate-500">FCFA</span>
-                                </div>
-                            </div>
-                            <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs sm:text-sm text-slate-500">
-                                <span class="flex items-center gap-1.5 truncate">
-                                    <span class="material-symbols-outlined text-[16px] text-slate-400">location_on</span> Adidogomé
-                                </span>
-                                <span class="text-xs text-slate-400">Il y a 5h</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Carte 7: Moto Yamaha MT-07 -->
-                    <div class="listing-item product-card group bg-white rounded-2xl border border-slate-200/80 hover:border-secondary/40 shadow-[0_2px_12px_rgba(15,23,42,0.04)] hover:shadow-[0_16px_32px_rgba(15,23,42,0.09)] transition-all duration-300 hover:-translate-y-1.5 flex flex-col overflow-hidden" data-cat="vehicules">
-                        <!-- Image agrandie -->
-                        <div class="relative w-full h-56 sm:h-52 md:h-60 overflow-hidden bg-slate-100">
-                            <img class="product-card-img w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out" alt="Moto Yamaha MT-07 ABS 2022" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBWtb2TsKDfZ0_AhHB-rzKvU39fPZEYqZ3EKK6e3oKYXS3upyAye_47WwSfHs_0XHQuNdkZTykhRLRs9X-r6KQXkqJoscaI7SjP6sGfhzY5zhlRbx00pSdomMOMBF-4vAywCzEti_pOnhxkHGOlGfz8dDTktzo3igKypm7UHtS1bjsRUQJEX2BScLlYspgq2AOSDIjPCS2hkjVYrNYroJpMiQWguYqv0xBFgVrkZxWRAnxu6U6BRTN9" loading="lazy" />
-                            <div class="absolute top-3 left-3">
-                                <span class="bg-white/95 backdrop-blur-md text-primary px-2.5 py-1 rounded-lg text-xs font-semibold shadow-sm">
-                                    Excellent état
-                                </span>
-                            </div>
-                            <button class="fav-btn absolute top-3 right-3 w-9 h-9 rounded-full bg-white/90 backdrop-blur-md hover:bg-white flex items-center justify-center text-slate-500 hover:text-error transition-all shadow-sm hover:scale-110 cursor-pointer" onclick="toggleFav(this)" title="Ajouter aux favoris">
-                                <span class="material-symbols-outlined text-[20px]">favorite</span>
-                            </button>
-                        </div>
-                        <!-- Contenu interne avec espacement amélioré -->
-                        <div class="p-5 md:p-6 flex flex-col flex-1 justify-between gap-3">
-                            <div>
-                                <span class="text-xs font-semibold text-secondary uppercase tracking-wider block mb-1">Motos</span>
-                                <h3 class="text-base sm:text-lg font-bold text-primary line-clamp-1 group-hover:text-secondary transition-colors">
-                                    Moto Yamaha MT-07 ABS 2022
-                                </h3>
-                                <div class="flex items-baseline gap-1 mt-2">
-                                    <span class="text-xl sm:text-2xl font-extrabold text-secondary tracking-tight">4 200 000</span>
-                                    <span class="text-xs font-bold text-slate-500">FCFA</span>
-                                </div>
-                            </div>
-                            <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs sm:text-sm text-slate-500">
-                                <span class="flex items-center gap-1.5 truncate">
-                                    <span class="material-symbols-outlined text-[16px] text-slate-400">location_on</span> Bè-Kpota
-                                </span>
-                                <span class="text-xs text-slate-400">Il y a 6h</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Carte 8: Seiko Diver -->
-                    <div class="listing-item product-card group bg-white rounded-2xl border border-slate-200/80 hover:border-secondary/40 shadow-[0_2px_12px_rgba(15,23,42,0.04)] hover:shadow-[0_16px_32px_rgba(15,23,42,0.09)] transition-all duration-300 hover:-translate-y-1.5 flex flex-col overflow-hidden" data-cat="tech">
-                        <!-- Image agrandie -->
-                        <div class="relative w-full h-56 sm:h-52 md:h-60 overflow-hidden bg-slate-100">
-                            <img class="product-card-img w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out" alt="Montre Seiko Prospex Auto 200m" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAOpJcwEl8oWxsQ08emdXGUo8x9pIOj1ugllp6dudCYFWNGl6pfHo4y9gQ3JKCHqhccJlFcnj7T799-jHOPbygUZ3Iukkq_7vtFq15hRlcF6nTPs_0Oi1EOWMZA9Be9eYEomQCM1uwa1hzA0U5IVN12N2O-e9Ll4ba0uytijmEyRkqoEY99APzWy8sekDHPg1AEu_P0JIyl7TgIZUsa87om4ZurjYSmolBGh2Gc35BuWopDL7Iii6iI" loading="lazy" />
-                            <div class="absolute top-3 left-3">
-                                <span class="bg-white/95 backdrop-blur-md text-primary px-2.5 py-1 rounded-lg text-xs font-semibold shadow-sm">
-                                    Boîte d'origine
-                                </span>
-                            </div>
-                            <button class="fav-btn absolute top-3 right-3 w-9 h-9 rounded-full bg-white/90 backdrop-blur-md hover:bg-white flex items-center justify-center text-slate-500 hover:text-error transition-all shadow-sm hover:scale-110 cursor-pointer" onclick="toggleFav(this)" title="Ajouter aux favoris">
-                                <span class="material-symbols-outlined text-[20px]">favorite</span>
-                            </button>
-                        </div>
-                        <!-- Contenu interne avec espacement amélioré -->
-                        <div class="p-5 md:p-6 flex flex-col flex-1 justify-between gap-3">
-                            <div>
-                                <span class="text-xs font-semibold text-secondary uppercase tracking-wider block mb-1">Montres</span>
-                                <h3 class="text-base sm:text-lg font-bold text-primary line-clamp-1 group-hover:text-secondary transition-colors">
-                                    Montre Seiko Prospex Auto 200m
-                                </h3>
-                                <div class="flex items-baseline gap-1 mt-2">
-                                    <span class="text-xl sm:text-2xl font-extrabold text-secondary tracking-tight">210 000</span>
-                                    <span class="text-xs font-bold text-slate-500">FCFA</span>
-                                </div>
-                            </div>
-                            <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs sm:text-sm text-slate-500">
-                                <span class="flex items-center gap-1.5 truncate">
-                                    <span class="material-symbols-outlined text-[16px] text-slate-400">location_on</span> Nyékonakpoè
-                                </span>
-                                <span class="text-xs text-slate-400">Il y a 7h</span>
-                            </div>
-                        </div>
-                    </div>
+                    @endforelse
                 </div>
 
                 <!-- Message si aucun produit ne correspond au filtre -->
@@ -548,12 +368,64 @@
                     <p class="text-on-surface-variant text-sm mt-1">Sélectionnez l'onglet "Tout" pour découvrir d'autres opportunités disponibles.</p>
                 </div>
 
-                <!-- Bouton de découverte -->
-                <div class="mt-14 flex justify-center">
-                    <a class="inline-flex items-center gap-2 px-8 py-3.5 bg-white hover:bg-slate-50 text-primary font-bold text-sm sm:text-base rounded-xl shadow-sm hover:shadow-md transition-all border border-slate-200/80 cursor-pointer" href="#">
-                        <span>Découvrir plus de 45 000 annonces</span>
-                        <span class="material-symbols-outlined text-[20px]">expand_more</span>
-                    </a>
+                <!-- Bloc Découvrir plus (Menu déroulant interactif & Extension) -->
+                <div class="mt-14 flex flex-col items-center justify-center relative" id="discover-more-section">
+                    <div class="relative inline-block text-left" id="discover-dropdown-wrapper">
+                        <button type="button"
+                            id="discover-more-btn"
+                            onclick="toggleDiscoverDropdown()"
+                            class="inline-flex items-center gap-2.5 px-8 py-3.5 bg-white hover:bg-slate-50 text-primary font-bold text-sm sm:text-base rounded-2xl shadow-sm hover:shadow-md transition-all border border-slate-200/80 cursor-pointer group">
+                            <span class="material-symbols-outlined text-secondary text-[22px] group-hover:rotate-180 transition-transform duration-300">expand_circle_down</span>
+                            <span>Découvrir plus</span>
+                            <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200/60 ml-1">
+                                @if($showAll)
+                                Toutes affichées ({{ $totalCount }})
+                                @else
+                                {{ min(10, $annonces->count()) }} / {{ $totalCount }}
+                                @endif
+                            </span>
+                            <span class="material-symbols-outlined text-[20px] text-slate-400 group-hover:text-primary transition-transform">expand_more</span>
+                        </button>
+
+                        <!-- Menu Déroulant interactif -->
+                        <div id="discover-dropdown-menu" class="hidden absolute left-1/2 -translate-x-1/2 mt-2 w-72 sm:w-80 bg-white rounded-2xl shadow-2xl border border-slate-200/80 py-2 z-40 transition-all">
+                            <div class="px-4 py-2 border-b border-slate-100 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                                Annonces du vendeur ({{ $totalCount }})
+                            </div>
+
+                            <!-- Option 1 : Voir toutes les annonces de ce vendeur -->
+                            <a href="{{ request()->fullUrlWithQuery(['all' => 1, 'limit' => null]) }}#listing-feed"
+                                class="flex items-center justify-between px-4 py-2.5 text-xs sm:text-sm font-semibold text-slate-800 hover:bg-secondary-container/20 hover:text-secondary transition-colors {{ $showAll ? 'bg-secondary-container/20 text-secondary' : '' }}">
+                                <div class="flex items-center gap-2.5">
+                                    <span class="material-symbols-outlined text-[18px] text-secondary">view_module</span>
+                                    <span>Toutes les annonces du vendeur</span>
+                                </div>
+                                <span class="text-[11px] font-bold px-2 py-0.5 rounded bg-secondary-container/40 text-secondary">{{ $totalCount }}</span>
+                            </a>
+
+                            <!-- Option 2 : 10 plus récentes (Par défaut) -->
+                            <a href="{{ request()->fullUrlWithQuery(['all' => null, 'limit' => null]) }}#listing-feed"
+                                class="flex items-center justify-between px-4 py-2.5 text-xs sm:text-sm font-semibold text-slate-800 hover:bg-slate-50 hover:text-primary transition-colors {{ !$showAll && (!request('limit') || request('limit') == 10) ? 'bg-slate-100 text-primary' : '' }}">
+                                <div class="flex items-center gap-2.5">
+                                    <span class="material-symbols-outlined text-[18px] text-slate-500">history</span>
+                                    <span>10 plus récentes (Par défaut)</span>
+                                </div>
+                                @if(!$showAll && (!request('limit') || request('limit') == 10))
+                                <span class="material-symbols-outlined text-[18px] text-secondary">check</span>
+                                @endif
+                            </a>
+
+                            <!-- Option 3 : Découvrir tout le catalogue Epsilon -->
+                            <a href="{{ route('home') }}#listing-feed"
+                                class="flex items-center justify-between px-4 py-2.5 text-xs sm:text-sm font-semibold text-slate-800 hover:bg-slate-50 hover:text-primary transition-colors border-t border-slate-100 mt-1 pt-2">
+                                <div class="flex items-center gap-2.5">
+                                    <span class="material-symbols-outlined text-[18px] text-primary">storefront</span>
+                                    <span>Explorer toute la marketplace</span>
+                                </div>
+                                <span class="material-symbols-outlined text-[16px] text-slate-400">arrow_forward</span>
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -582,7 +454,7 @@
                         </p>
                     </div>
                     <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
-                        <a class="inline-flex items-center justify-center gap-2.5 bg-secondary hover:bg-on-secondary-container text-white font-bold text-base px-8 py-4 rounded-xl shadow-lg hover:shadow-xl transition-all text-center cursor-pointer" href="#">
+                        <a class="inline-flex items-center justify-center gap-2.5 bg-secondary hover:bg-on-secondary-container text-white font-bold text-base px-8 py-4 rounded-xl shadow-lg hover:shadow-xl transition-all text-center cursor-pointer" href="{{ route('dashboard', ['tab' => 'publier']) }}">
                             <span class="material-symbols-outlined text-[22px]">add_circle</span>
                             <span>Déposer une annonce gratuitement</span>
                         </a>
@@ -704,7 +576,7 @@
             </a>
 
             <!-- 3. Déposer (+) Bouton central surélevé -->
-            <a href="#" class="flex flex-col items-center justify-center -mt-5 group" title="Déposer une annonce">
+            <a href="{{ route('dashboard', ['tab' => 'publier']) }}" class="flex flex-col items-center justify-center -mt-5 group" title="Déposer une annonce">
                 <div class="w-12 h-12 rounded-full bg-secondary text-white flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform border-4 border-white">
                     <span class="material-symbols-outlined text-[24px]">add</span>
                 </div>
@@ -712,14 +584,14 @@
             </a>
 
             <!-- 4. Messages -->
-            <a href="#" class="relative flex flex-col items-center justify-center text-slate-500 hover:text-primary py-1 px-2 transition-colors">
+            <a href="{{ route('dashboard') }}" class="relative flex flex-col items-center justify-center text-slate-500 hover:text-primary py-1 px-2 transition-colors">
                 <span class="material-symbols-outlined text-[24px]">chat_bubble</span>
                 <span class="absolute top-1 right-2 flex items-center justify-center w-4 h-4 bg-secondary text-white font-bold text-[10px] rounded-full shadow-sm">2</span>
                 <span class="text-[11px] font-medium mt-0.5">Messages</span>
             </a>
 
             <!-- 5. Compte -->
-            <a href="#" class="flex flex-col items-center justify-center text-slate-500 hover:text-primary py-1 px-2 transition-colors">
+            <a href="{{ route('dashboard') }}" class="flex flex-col items-center justify-center text-slate-500 hover:text-primary py-1 px-2 transition-colors">
                 <span class="material-symbols-outlined text-[24px]">person</span>
                 <span class="text-[11px] font-medium mt-0.5">Compte</span>
             </a>
@@ -727,4 +599,23 @@
     </nav>
 
 </div>
+
+@push('scripts')
+<script>
+    function toggleDiscoverDropdown() {
+        const menu = document.getElementById('discover-dropdown-menu');
+        if (menu) {
+            menu.classList.toggle('hidden');
+        }
+    }
+
+    document.addEventListener('click', function(e) {
+        const wrapper = document.getElementById('discover-dropdown-wrapper');
+        const menu = document.getElementById('discover-dropdown-menu');
+        if (wrapper && menu && !wrapper.contains(e.target)) {
+            menu.classList.add('hidden');
+        }
+    });
+</script>
+@endpush
 @endsection

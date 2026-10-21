@@ -137,7 +137,7 @@
             <div id="flash-info-message" data-message="{{ session('info') }}" style="display:none;"></div>
             @endif
             @if(isset($errors) && $errors->any())
-            <div id="flash-validation-errors" data-errors='@json($errors->all())' data-tab="{{ session('active_tab', ($errors->has('nom') || $errors->has('prenom') || $errors->has('phone') || $errors->has('carte') || $errors->has('profil') || $errors->has('password_confirmation') || old('nom') || old('prenom') ? 'signup' : 'login')) }}" style="display:none;"></div>
+            <div id="flash-validation-errors" data-errors="{{ e(json_encode($errors->all())) }}" data-tab="{{ session('active_tab', ($errors->has('nom') || $errors->has('prenom') || $errors->has('phone') || $errors->has('carte') || $errors->has('profil') || $errors->has('password_confirmation') || old('nom') || old('prenom') ? 'signup' : 'login')) }}" style="display:none;"></div>
             @endif
             @if(session('active_tab'))
             <div id="flash-active-tab" data-tab="{{ session('active_tab') }}" style="display:none;"></div>
@@ -188,7 +188,7 @@
                                     <input type="checkbox" name="remember" {{ old('remember') ? 'checked' : '' }}> Rester connecté
                                 </label>
                                 <div class="form-forgot">
-                                    <a href="#">Mot de passe oublié ?</a>
+                                    <a href="{{ route('password.request') }}" class="text-xs text-emerald-600 hover:underline">Mot de passe oublié ?</a>
                                 </div>
                             </div>
 

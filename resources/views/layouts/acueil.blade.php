@@ -165,6 +165,49 @@
     <!-- Footer Principal (situé dans layouts) -->
     @include('layouts.footer')
 
+    <!-- ================================================================= -->
+    <!-- MODALE UNIVERSELLE : GALERIE / LIGHTBOX PHOTOS SUR LES CARTES     -->
+    <!-- ================================================================= -->
+    <div id="gallery-lightbox-modal" class="fixed inset-0 z-[100] bg-black/90 backdrop-blur-md flex flex-col justify-between p-4 sm:p-6 hidden">
+        <!-- Top bar de la galerie -->
+        <div class="flex items-center justify-between text-white max-w-5xl mx-auto w-full">
+            <div class="flex items-center gap-3">
+                <span class="material-symbols-outlined text-secondary-fixed text-[24px]">photo_library</span>
+                <div>
+                    <h4 id="gallery-title" class="font-bold text-sm sm:text-base text-white truncate max-w-[280px] sm:max-w-md">Galerie photos</h4>
+                    <span id="gallery-counter" class="text-xs text-slate-400">Photo 1 / 1</span>
+                </div>
+            </div>
+            <button type="button" onclick="closePhotoGallery()" class="w-10 h-10 rounded-full bg-white/10 hover:bg-white/25 flex items-center justify-center transition-colors text-white cursor-pointer" title="Fermer la galerie (Echap)">
+                <span class="material-symbols-outlined text-[24px]">close</span>
+            </button>
+        </div>
+
+        <!-- Centre : Image en grand avec flèches précédente / suivante -->
+        <div class="relative flex-1 flex items-center justify-center max-w-5xl mx-auto w-full my-4 overflow-hidden">
+            <button type="button" id="gallery-prev-btn" onclick="prevGalleryPhoto()" class="absolute left-2 z-10 w-12 h-12 rounded-full bg-black/50 hover:bg-black/80 text-white flex items-center justify-center transition-all cursor-pointer" title="Précédente">
+                <span class="material-symbols-outlined text-[28px]">chevron_left</span>
+            </button>
+
+            <img id="gallery-main-img" src="" alt="Vue agrandie" class="max-h-[68vh] max-w-full object-contain rounded-2xl shadow-2xl transition-all duration-200">
+
+            <button type="button" id="gallery-next-btn" onclick="nextGalleryPhoto()" class="absolute right-2 z-10 w-12 h-12 rounded-full bg-black/50 hover:bg-black/80 text-white flex items-center justify-center transition-all cursor-pointer" title="Suivante">
+                <span class="material-symbols-outlined text-[28px]">chevron_right</span>
+            </button>
+        </div>
+
+        <!-- Bas : Barre de miniatures (Thumbnails) -->
+        <div id="gallery-thumbnails-strip" class="flex items-center justify-center gap-2 max-w-3xl mx-auto w-full overflow-x-auto py-2">
+            <!-- Rempli dynamiquement -->
+        </div>
+    </div>
+
+    <!-- Configuration globale Auth & Routes JS -->
+    <script>
+        window.isUserLoggedIn = {{ Auth::check() ? 'true' : 'false' }};
+        window.loginUrl = "{{ route('login') }}";
+    </script>
+
     <!-- Scripts Client -->
     <script src="{{ asset('js/marketplace.js') }}"></script>
     @stack('scripts')
