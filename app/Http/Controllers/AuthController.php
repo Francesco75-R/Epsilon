@@ -112,6 +112,8 @@ class AuthController extends Controller
             'telephone.max' => 'Le téléphone ne peut pas dépasser 35 caractères.',
             'adresse.required' => 'L\'adresse de résidence est obligatoire.',
             'adresse.max' => 'L\'adresse ne peut pas dépasser 255 caractères.',
+            'genre.required' => 'Veuillez sélectionner votre genre.',
+            'genre.in' => 'Veuillez choisir un genre valide (Masculin ou Féminin).',
             'photo.image' => 'Le fichier doit être une image valide.',
             'photo.mimes' => 'Formats acceptés pour la photo : JPG, JPEG, PNG, WEBP.',
             'photo.max' => 'La photo ne doit pas dépasser 5 Mo.',
@@ -122,6 +124,7 @@ class AuthController extends Controller
             'prenom' => 'required|string|max:60',
             'telephone' => 'required|string|max:35',
             'adresse' => 'required|string|max:255',
+            'genre' => 'required|string|in:Masculin,Féminin,Homme,Femme',
             'photo' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:5120',
         ], $messages);
 
@@ -129,6 +132,7 @@ class AuthController extends Controller
         $user->prenom = trim($request->prenom);
         $user->telephone = trim($request->telephone);
         $user->adresse = trim($request->adresse);
+        $user->genre = trim($request->genre);
 
         // Upload et remplacement de la photo de profil dans public/photo
         if ($request->hasFile('photo')) {

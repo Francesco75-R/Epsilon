@@ -28,6 +28,7 @@ class User extends Authenticatable
         'photo',
         'carte',
         'password',
+        'email_verified_at',
     ];
 
     /**

@@ -152,10 +152,11 @@ function openPhotoGallery(photos, title) {
     }
 
     // Normalisation des URLs des photos
+    const baseUrl = (window.assetBaseUrl || '/').replace(/\/+$/, '') + '/';
     currentGalleryPhotos = photos.map(p => {
-        if (!p) return '/photo/default.png';
-        if (p.startsWith('http://') || p.startsWith('https://') || p.startsWith('/')) return p;
-        return '/' + p;
+        if (!p) return baseUrl + 'photo/default.png';
+        if (p.startsWith('http://') || p.startsWith('https://')) return p;
+        return baseUrl + p.replace(/^\/+/, '');
     });
 
     currentGalleryIndex = 0;

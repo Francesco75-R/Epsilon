@@ -239,32 +239,6 @@
                                 </div>
                             </div>
 
-                            <div class="form-group">
-                                <label class="form-label" for="signup-adresse">Adresse ou Quartier</label>
-                                <input class="form-input" type="text" name="adresse" id="signup-adresse" placeholder="Lomé - Tokoin, Hédzranawoé..." value="{{ old('adresse') }}" required>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="form-label" for="signup-genre">Genre</label>
-                                <select class="form-input" name="genre" id="signup-genre" required style="cursor:pointer;">
-                                    <option value="">Choisir un genre</option>
-                                    <option value="Homme" {{ old('genre') == 'Homme' ? 'selected' : '' }}>Homme</option>
-                                    <option value="Femme" {{ old('genre') == 'Femme' ? 'selected' : '' }}>Femme</option>
-                                </select>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="form-label" for="profil">Photo de profil</label>
-                                <input class="form-input" type="file" name="profil" id="profil" accept="image/jpeg,image/png,image/jpg,image/webp" required>
-                                <small style="font-size:0.75rem; color:var(--slate);">JPG, PNG ou WEBP (Max: 7 Mo)</small>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="form-label" for="carte">Carte d'identité (CNI / Passeport / Permis)</label>
-                                <input class="form-input" type="file" name="carte" id="carte" accept="image/jpeg,image/png,image/jpg,image/webp" required>
-                                <small style="font-size:0.75rem; color:var(--slate);">Pour la vérification et le badge de confiance vendeur</small>
-                            </div>
-
                             <div class="form-row">
                                 <div class="form-group">
                                     <label class="form-label" for="signup-password">Mot de passe</label>

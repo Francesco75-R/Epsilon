@@ -30,23 +30,6 @@ class insert_users extends Controller
             'phone.string' => 'Le numéro de téléphone n\'est pas valide.',
             'phone.max' => 'Le numéro de téléphone ne peut pas dépasser 35 caractères.',
 
-            'adresse.required' => 'L\'adresse est obligatoire.',
-            'adresse.string' => 'L\'adresse doit être valide.',
-            'adresse.max' => 'L\'adresse ne peut pas dépasser 255 caractères.',
-
-            'genre.required' => 'Veuillez sélectionner votre genre (Homme ou Femme).',
-            'genre.in' => 'Le genre sélectionné doit être Homme ou Femme.',
-
-            'profil.required' => 'La photo de profil est requise pour sécuriser votre compte.',
-            'profil.image' => 'Le fichier de profil doit impérativement être une image.',
-            'profil.mimes' => 'La photo de profil doit être au format JPG, JPEG, PNG ou WEBP.',
-            'profil.max' => 'La photo de profil ne doit pas dépasser 3 Mo.',
-
-            'carte.required' => 'La pièce d\'identité est requise pour certifier votre compte vendeur.',
-            'carte.image' => 'La pièce d\'identité doit impérativement être une image.',
-            'carte.mimes' => 'La pièce d\'identité doit être au format JPG, JPEG, PNG ou WEBP.',
-            'carte.max' => 'La pièce d\'identité ne doit pas dépasser 3 Mo.',
-
             'password.required' => 'Le mot de passe est obligatoire.',
             'password.string' => 'Le mot de passe doit être valide.',
             'password.min' => 'Le mot de passe doit comporter au moins 8 caractères.',
@@ -58,46 +41,21 @@ class insert_users extends Controller
             'prenom' => 'required|string|max:60',
             'email' => 'required|email|max:90|unique:users,email',
             'phone' => 'required|string|max:35',
-            'adresse' => 'required|string|max:255',
-            'genre' => 'required|string|in:Homme,Femme',
-            'profil' => 'required|image|mimes:jpeg,jpg,png,webp|max:7168',
-            'carte' => 'required|image|mimes:jpeg,jpg,png,webp|max:7168',
             'password' => 'required|string|min:8|confirmed',
         ], $messages);
 
         // 2. Traitement des fichiers et insertion sécurisée
         try {
-            // Création du dossier d'upload s'il n'existe pas
-            $uploadDirectory = public_path('photo');
-            if (!file_exists($uploadDirectory)) {
-                mkdir($uploadDirectory, 0755, true);
-            }
-
-            $profilpath = null;
-            if ($request->hasFile('profil')) {
-                $profilfile = $request->file('profil');
-                $profilname = time() . '_photo_' . uniqid() . '.' . $profilfile->getClientOriginalExtension();
-                $profilfile->move($uploadDirectory, $profilname);
-                $profilpath = 'photo/' . $profilname;
-            }
-
-            $cartepath = null;
-            if ($request->hasFile('carte')) {
-                $cartefile = $request->file('carte');
-                $cartename = time() . '_carte_' . uniqid() . '.' . $cartefile->getClientOriginalExtension();
-                $cartefile->move($uploadDirectory, $cartename);
-                $cartepath = 'photo/' . $cartename;
-            }
 
             $user = User::create([
                 'nom' => trim($request->nom),
                 'prenom' => trim($request->prenom),
                 'email' => strtolower(trim($request->email)),
                 'telephone' => trim($request->phone),
-                'adresse' => trim($request->adresse),
-                'genre' => $request->genre,
-                'photo' => $profilpath,
-                'carte' => $cartepath,
+                'adresse' => null,
+                'genre' => null,
+                'photo' => null,
+                'carte' => null,
                 'password' => Hash::make($request->password),
                 'email_verified_at' => null,
             ]);
@@ -136,7 +94,7 @@ class insert_users extends Controller
 
                 \Illuminate\Support\Facades\Mail::html($html, function ($message) use ($user, $otp) {
                     $message->to($user->email, $user->prenom . ' ' . $user->nom)
-                            ->subject('Code de vérification de votre compte Epsilon : ' . $otp);
+                        ->subject('Code de vérification de votre compte Epsilon : ' . $otp);
                 });
             } catch (\Throwable $e) {
                 \Illuminate\Support\Facades\Log::error('Erreur SMTP Inscription : ' . $e->getMessage());

@@ -1,30 +1,46 @@
-@php 
-    $errors = $errors ?? new \Illuminate\Support\ViewErrorBag; 
-    $user = $user ?? Auth::user(); 
-    $myAnnonces = $myAnnonces ?? collect(); 
+@php
+$errors = $errors ?? new \Illuminate\Support\ViewErrorBag;
+$user = $user ?? Auth::user();
+$myAnnonces = $myAnnonces ?? collect();
 @endphp
 <!DOCTYPE html>
 <html lang="fr" class="h-full">
+
 <head>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Espace Membre - Epsilon Marketplace</title>
 
     <!-- Google Fonts & Material Symbols -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
 
     <style>
         @layer base {
-            html, body { margin: 0; padding: 0; }
-            body { overscroll-behavior-y: none; }
+
+            html,
+            body {
+                margin: 0;
+                padding: 0;
+            }
+
+            body {
+                overscroll-behavior-y: none;
+            }
         }
+
         /* Masquer scrollbar par défaut pour look d'application épuré */
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
 
         /* Animation des drag & drop et transitions */
         .thumb-dragging {
@@ -33,6 +49,7 @@
             border-style: dashed !important;
             border-color: #059669 !important;
         }
+
         .thumb-drag-over {
             transform: scale(1.05);
             box-shadow: 0 0 0 3px #10b981 !important;
@@ -40,15 +57,90 @@
 
         /* Animation Toasts */
         @keyframes toastIn {
-            from { transform: translateX(110%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
+            from {
+                transform: translateX(110%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
         }
+
         @keyframes toastOut {
-            from { transform: translateX(0); opacity: 1; }
-            to { transform: translateX(110%); opacity: 0; }
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+
+            to {
+                transform: translateX(110%);
+                opacity: 0;
+            }
         }
-        .animate-toast-in { animation: toastIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-        .animate-toast-out { animation: toastOut 0.3s ease forwards; }
+
+        .animate-toast-in {
+            animation: toastIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .animate-toast-out {
+            animation: toastOut 0.3s ease forwards;
+        }
+
+        /* Style personnalisé pour le sélecteur de genre du profil */
+        .profile-select-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .profile-select-icon-left {
+            position: absolute;
+            left: 0.875rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            transition: color 0.2s ease;
+        }
+
+        .profile-select-chevron {
+            position: absolute;
+            right: 0.875rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            transition: transform 0.2s ease, color 0.2s ease;
+        }
+
+        .profile-select-field {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            cursor: pointer;
+        }
+
+        .profile-select-wrapper:focus-within .profile-select-icon-left,
+        .profile-select-wrapper:focus-within .profile-select-chevron {
+            color: #059669;
+        }
+
+        .profile-select-wrapper:focus-within .profile-select-chevron {
+            transform: translateY(-50%) rotate(180deg);
+        }
+
+        .profile-select-field option {
+            background-color: #ffffff;
+            color: #1e293b;
+            font-weight: 500;
+            padding: 8px 12px;
+        }
     </style>
 
     <script src="https://cdn.tailwindcss.com"></script>
@@ -83,16 +175,17 @@
         };
     </script>
 </head>
+
 <body class="bg-surface font-sans text-on-surface antialiased min-h-screen flex flex-col">
 
     <!-- Notifications Flottantes (Toasts) -->
     <div id="toast-container" class="fixed top-5 right-5 z-[100] flex flex-col gap-3 pointer-events-none max-w-sm w-full"></div>
 
     @if(session('success'))
-        <div id="flash-success" data-message="{{ session('success') }}" class="hidden"></div>
+    <div id="flash-success" data-message="{{ session('success') }}" class="hidden"></div>
     @endif
     @if(session('error'))
-        <div id="flash-error" data-message="{{ session('error') }}" class="hidden"></div>
+    <div id="flash-error" data-message="{{ session('error') }}" class="hidden"></div>
     @endif
 
     <!-- Overlay Mobile pour la Sidebar -->
@@ -126,11 +219,11 @@
             <div class="p-5 flex items-center gap-3 bg-slate-50/70 border-b border-slate-100">
                 <div class="relative flex-shrink-0">
                     @if(Auth::user()->photo && file_exists(public_path(Auth::user()->photo)))
-                        <img src="{{ asset(Auth::user()->photo) }}" alt="{{ Auth::user()->prenom }}" class="w-12 h-12 rounded-full object-cover ring-2 ring-emerald-500/40 shadow-sm">
+                    <img src="{{ asset(Auth::user()->photo) }}" alt="{{ Auth::user()->prenom }}" class="w-12 h-12 rounded-full object-cover ring-2 ring-emerald-500/40 shadow-sm">
                     @else
-                        <div class="w-12 h-12 rounded-full bg-secondary text-white font-bold flex items-center justify-center text-base shadow-sm ring-2 ring-emerald-100">
-                            {{ strtoupper(substr(Auth::user()->prenom ?? 'U', 0, 1)) }}
-                        </div>
+                    <div class="w-12 h-12 rounded-full bg-secondary text-white font-bold flex items-center justify-center text-base shadow-sm ring-2 ring-emerald-100">
+                        {{ strtoupper(substr(Auth::user()->prenom ?? 'U', 0, 1)) }}
+                    </div>
                     @endif
                     <div class="absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full bg-emerald-500 ring-2 ring-white"></div>
                 </div>
@@ -150,6 +243,10 @@
 
             <!-- Menu de navigation -->
             <nav class="flex flex-col gap-1 px-3" id="sidebar-nav">
+                <button type="button" onclick="switchDashboardTab('profil')" id="nav-btn-profil" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-primary transition-all">
+                    <span class="material-symbols-outlined text-[22px]">person</span>
+                    <span>Mon Profil</span>
+                </button>
                 <button type="button" onclick="switchDashboardTab('dashboard')" id="nav-btn-dashboard" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all bg-emerald-50 text-emerald-800">
                     <span class="material-symbols-outlined text-[22px]">dashboard</span>
                     <span>Tableau de bord</span>
@@ -168,20 +265,15 @@
                     <span>Créer une annonce</span>
                 </button>
 
-                <button type="button" onclick="switchDashboardTab('profil')" id="nav-btn-profil" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-primary transition-all">
-                    <span class="material-symbols-outlined text-[22px]">person</span>
-                    <span>Mon Profil</span>
-                </button>
-
                 <a href="{{ route('page_client') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-primary transition-all">
                     <span class="material-symbols-outlined text-[22px]">person</span>
                     <span>Ma page client public</span>
                 </a>
 
-                <a href="{{ route('home') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-primary transition-all">
+                <!-- <a href="{{ route('home') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-primary transition-all">
                     <span class="material-symbols-outlined text-[22px]">storefront</span>
                     <span>Marketplace public</span>
-                </a>
+                </a> -->
             </nav>
         </div>
 
@@ -224,11 +316,11 @@
                 <!-- Avatar Profil Header -->
                 <a href="{{ route('page_client') }}" class="flex items-center gap-2 pl-1 group" title="Voir ma page client">
                     @if(Auth::user()->photo && file_exists(public_path(Auth::user()->photo)))
-                        <img src="{{ asset(Auth::user()->photo) }}" alt="{{ Auth::user()->prenom }}" class="w-8 h-8 rounded-full object-cover ring-2 ring-emerald-500/30">
+                    <img src="{{ asset(Auth::user()->photo) }}" alt="{{ Auth::user()->prenom }}" class="w-8 h-8 rounded-full object-cover ring-2 ring-emerald-500/30">
                     @else
-                        <div class="w-8 h-8 rounded-full bg-secondary text-white font-bold flex items-center justify-center text-xs">
-                            {{ strtoupper(substr(Auth::user()->prenom ?? 'U', 0, 1)) }}
-                        </div>
+                    <div class="w-8 h-8 rounded-full bg-secondary text-white font-bold flex items-center justify-center text-xs">
+                        {{ strtoupper(substr(Auth::user()->prenom ?? 'U', 0, 1)) }}
+                    </div>
                     @endif
                     <span class="hidden md:inline text-xs font-bold text-slate-800">{{ Auth::user()->prenom }}</span>
                 </a>
@@ -346,64 +438,64 @@
                         </div>
 
                         @if($myAnnonces->isEmpty())
-                            <div class="py-12 flex flex-col items-center justify-center text-center">
-                                <div class="w-16 h-16 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-3">
-                                    <span class="material-symbols-outlined text-[32px]">add_business</span>
-                                </div>
-                                <h3 class="text-base font-bold text-slate-800">Aucune annonce publiée pour le moment</h3>
-                                <p class="text-xs text-slate-500 max-w-sm mt-1 mb-4">Créez votre première annonce en moins de 2 minutes pour la rendre visible à des milliers d'acheteurs.</p>
-                                <button type="button" onclick="switchDashboardTab('publier')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl transition-all shadow-sm">
-                                    + Publier ma première annonce
-                                </button>
+                        <div class="py-12 flex flex-col items-center justify-center text-center">
+                            <div class="w-16 h-16 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-3">
+                                <span class="material-symbols-outlined text-[32px]">add_business</span>
                             </div>
+                            <h3 class="text-base font-bold text-slate-800">Aucune annonce publiée pour le moment</h3>
+                            <p class="text-xs text-slate-500 max-w-sm mt-1 mb-4">Créez votre première annonce en moins de 2 minutes pour la rendre visible à des milliers d'acheteurs.</p>
+                            <button type="button" onclick="switchDashboardTab('publier')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl transition-all shadow-sm">
+                                + Publier ma première annonce
+                            </button>
+                        </div>
                         @else
-                            <div class="overflow-x-auto">
-                                <table class="w-full text-left border-collapse">
-                                    <thead>
-                                        <tr class="text-[11px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100 pb-2">
-                                            <th class="py-2.5 px-3">Annonce</th>
-                                            <th class="py-2.5 px-3">Catégorie</th>
-                                            <th class="py-2.5 px-3">Prix</th>
-                                            <th class="py-2.5 px-3">Statut</th>
-                                            <th class="py-2.5 px-3 text-right">Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="divide-y divide-slate-100 text-sm">
-                                        @foreach($myAnnonces->take(4) as $item)
-                                            <tr class="hover:bg-slate-50/70 transition-colors">
-                                                <td class="py-3 px-3">
-                                                    <div class="flex items-center gap-3">
-                                                        @php
-                                                            $cover = is_array($item->photos) && count($item->photos) > 0 ? asset($item->photos[0]) : asset('photo/default.png');
-                                                        @endphp
-                                                        <img src="{{ $cover }}" alt="{{ $item->titre }}" class="w-12 h-12 rounded-xl object-cover border border-slate-200/70 flex-shrink-0">
-                                                        <div class="min-w-0">
-                                                            <div class="font-bold text-slate-900 truncate max-w-[200px]">{{ $item->titre }}</div>
-                                                            <div class="text-xs text-slate-400 truncate">{{ $item->lieu }} • {{ $item->formatted_date }}</div>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td class="py-3 px-3 text-xs text-slate-600 font-medium">{{ $item->categorie }}</td>
-                                                <td class="py-3 px-3 font-extrabold text-emerald-700 whitespace-nowrap">{{ number_format($item->prix, 0, ',', ' ') }} FCFA</td>
-                                                <td class="py-3 px-3">
-                                                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700">
-                                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> En ligne
-                                                    </span>
-                                                </td>
-                                                <td class="py-3 px-3 text-right whitespace-nowrap">
-                                                    <div class="inline-flex items-center gap-1.5">
-                                                        <!-- Bouton Photos Modal -->
-                                                        <button type="button" data-photos="{{ e(json_encode($item->photos)) }}" data-titre="{{ $item->titre }}" onclick="openGalleryFromElement(this)" class="px-2.5 py-1 text-xs font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-lg inline-flex items-center gap-1 transition-colors" title="Voir les photos de l'annonce">
-                                                            <span class="material-symbols-outlined text-[15px]">photo_library</span>
-                                                            <span>Photos ({{ is_array($item->photos) ? count($item->photos) : 0 }})</span>
-                                                        </button>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="text-[11px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100 pb-2">
+                                        <th class="py-2.5 px-3">Annonce</th>
+                                        <th class="py-2.5 px-3">Catégorie</th>
+                                        <th class="py-2.5 px-3">Prix</th>
+                                        <th class="py-2.5 px-3">Statut</th>
+                                        <th class="py-2.5 px-3 text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100 text-sm">
+                                    @foreach($myAnnonces->take(4) as $item)
+                                    <tr class="hover:bg-slate-50/70 transition-colors">
+                                        <td class="py-3 px-3">
+                                            <div class="flex items-center gap-3">
+                                                @php
+                                                $cover = is_array($item->photos) && count($item->photos) > 0 ? asset($item->photos[0]) : asset('photo/default.png');
+                                                @endphp
+                                                <img src="{{ $cover }}" alt="{{ $item->titre }}" class="w-12 h-12 rounded-xl object-cover border border-slate-200/70 flex-shrink-0">
+                                                <div class="min-w-0">
+                                                    <div class="font-bold text-slate-900 truncate max-w-[200px]">{{ $item->titre }}</div>
+                                                    <div class="text-xs text-slate-400 truncate">{{ $item->lieu }} • {{ $item->formatted_date }}</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="py-3 px-3 text-xs text-slate-600 font-medium">{{ $item->categorie }}</td>
+                                        <td class="py-3 px-3 font-extrabold text-emerald-700 whitespace-nowrap">{{ number_format($item->prix, 0, ',', ' ') }} FCFA</td>
+                                        <td class="py-3 px-3">
+                                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> En ligne
+                                            </span>
+                                        </td>
+                                        <td class="py-3 px-3 text-right whitespace-nowrap">
+                                            <div class="inline-flex items-center gap-1.5">
+                                                <!-- Bouton Photos Modal -->
+                                                <button type="button" data-photos="{{ e(json_encode($item->photos)) }}" data-titre="{{ $item->titre }}" onclick="openGalleryFromElement(this)" class="px-2.5 py-1 text-xs font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-lg inline-flex items-center gap-1 transition-colors" title="Voir les photos de l'annonce">
+                                                    <span class="material-symbols-outlined text-[15px]">photo_library</span>
+                                                    <span>Photos ({{ is_array($item->photos) ? count($item->photos) : 0 }})</span>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
                         @endif
                     </div>
 
@@ -474,88 +566,88 @@
                 </div>
 
                 @if($myAnnonces->isEmpty())
-                    <div class="bg-white rounded-2xl p-12 text-center border border-slate-200/80 shadow-sm max-w-md mx-auto">
-                        <div class="w-16 h-16 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-4">
-                            <span class="material-symbols-outlined text-[32px]">inventory_2</span>
-                        </div>
-                        <h2 class="text-lg font-bold text-slate-800 mb-1">Vous n'avez aucune annonce active</h2>
-                        <p class="text-xs text-slate-500 mb-5 leading-relaxed">
-                            Vous n'avez pas encore publié de produit ou service. Cliquez ci-dessous pour déposer votre première offre gratuitement.
-                        </p>
-                        <button type="button" onclick="switchDashboardTab('publier')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm px-5 py-2.5 rounded-xl shadow-sm transition-all">
-                            Publier une annonce maintenant
-                        </button>
+                <div class="bg-white rounded-2xl p-12 text-center border border-slate-200/80 shadow-sm max-w-md mx-auto">
+                    <div class="w-16 h-16 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-4">
+                        <span class="material-symbols-outlined text-[32px]">inventory_2</span>
                     </div>
+                    <h2 class="text-lg font-bold text-slate-800 mb-1">Vous n'avez aucune annonce active</h2>
+                    <p class="text-xs text-slate-500 mb-5 leading-relaxed">
+                        Vous n'avez pas encore publié de produit ou service. Cliquez ci-dessous pour déposer votre première offre gratuitement.
+                    </p>
+                    <button type="button" onclick="switchDashboardTab('publier')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm px-5 py-2.5 rounded-xl shadow-sm transition-all">
+                        Publier une annonce maintenant
+                    </button>
+                </div>
                 @else
-                    <!-- Grille des cartes produits du membre -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-                        @foreach($myAnnonces as $ad)
-                            <div class="bg-white rounded-2xl border border-slate-200/80 hover:border-emerald-500/40 shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col overflow-hidden group">
-                                <!-- Vignette / Image de couverture (Uniquement photos[0]) -->
-                                <div class="relative w-full h-48 bg-slate-100 overflow-hidden">
-                                    @php
-                                        $cover = is_array($ad->photos) && count($ad->photos) > 0 ? asset($ad->photos[0]) : asset('photo/default.png');
-                                        $countPhotos = is_array($ad->photos) ? count($ad->photos) : 0;
-                                    @endphp
-                                    <img src="{{ $cover }}" alt="{{ $ad->titre }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out" loading="lazy">
-                                    
-                                    <!-- Badges d'état & Catégorie -->
-                                    <div class="absolute top-2.5 left-2.5 flex flex-wrap gap-1.5">
-                                        <span class="bg-white/95 backdrop-blur-md text-slate-800 text-[11px] font-bold px-2 py-0.5 rounded-md shadow-sm">
-                                            {{ $ad->etat }}
-                                        </span>
-                                        <span class="bg-emerald-700/90 backdrop-blur-md text-white text-[11px] font-bold px-2 py-0.5 rounded-md shadow-sm">
-                                            {{ $ad->categorie }}
-                                        </span>
-                                    </div>
+                <!-- Grille des cartes produits du membre -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+                    @foreach($myAnnonces as $ad)
+                    <div class="bg-white rounded-2xl border border-slate-200/80 hover:border-emerald-500/40 shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col overflow-hidden group">
+                        <!-- Vignette / Image de couverture (Uniquement photos[0]) -->
+                        <div class="relative w-full h-48 bg-slate-100 overflow-hidden">
+                            @php
+                            $cover = is_array($ad->photos) && count($ad->photos) > 0 ? asset($ad->photos[0]) : asset('photo/default.png');
+                            $countPhotos = is_array($ad->photos) ? count($ad->photos) : 0;
+                            @endphp
+                            <img src="{{ $cover }}" alt="{{ $ad->titre }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out" loading="lazy">
 
-                                    <!-- Bouton "Photos" flottant sur la carte -->
-                                    <button type="button" data-photos="{{ e(json_encode($ad->photos)) }}" data-titre="{{ $ad->titre }}" onclick="openGalleryFromElement(this)" class="absolute bottom-2.5 right-2.5 bg-slate-900/85 hover:bg-emerald-600 text-white text-xs font-bold px-2.5 py-1 rounded-lg backdrop-blur-md shadow-sm inline-flex items-center gap-1.5 transition-all cursor-pointer">
-                                        <span class="material-symbols-outlined text-[16px]">photo_library</span>
-                                        <span>Photos ({{ $countPhotos }})</span>
-                                    </button>
+                            <!-- Badges d'état & Catégorie -->
+                            <div class="absolute top-2.5 left-2.5 flex flex-wrap gap-1.5">
+                                <span class="bg-white/95 backdrop-blur-md text-slate-800 text-[11px] font-bold px-2 py-0.5 rounded-md shadow-sm">
+                                    {{ $ad->etat }}
+                                </span>
+                                <span class="bg-emerald-700/90 backdrop-blur-md text-white text-[11px] font-bold px-2 py-0.5 rounded-md shadow-sm">
+                                    {{ $ad->categorie }}
+                                </span>
+                            </div>
+
+                            <!-- Bouton "Photos" flottant sur la carte -->
+                            <button type="button" data-photos="{{ e(json_encode($ad->photos)) }}" data-titre="{{ $ad->titre }}" onclick="openGalleryFromElement(this)" class="absolute bottom-2.5 right-2.5 bg-slate-900/85 hover:bg-emerald-600 text-white text-xs font-bold px-2.5 py-1 rounded-lg backdrop-blur-md shadow-sm inline-flex items-center gap-1.5 transition-all cursor-pointer">
+                                <span class="material-symbols-outlined text-[16px]">photo_library</span>
+                                <span>Photos ({{ $countPhotos }})</span>
+                            </button>
+                        </div>
+
+                        <!-- Détails de l'annonce -->
+                        <div class="p-4 flex flex-col flex-1 justify-between gap-3">
+                            <div>
+                                <h3 class="font-bold text-base text-slate-900 line-clamp-1 group-hover:text-emerald-700 transition-colors">
+                                    {{ $ad->titre }}
+                                </h3>
+                                <div class="flex items-baseline gap-1 mt-1.5">
+                                    <span class="text-xl font-extrabold text-emerald-700">{{ number_format($ad->prix, 0, ',', ' ') }}</span>
+                                    <span class="text-xs font-bold text-slate-400">FCFA</span>
                                 </div>
+                                <p class="text-xs text-slate-500 line-clamp-2 mt-2 leading-relaxed">
+                                    {{ $ad->description }}
+                                </p>
+                            </div>
 
-                                <!-- Détails de l'annonce -->
-                                <div class="p-4 flex flex-col flex-1 justify-between gap-3">
-                                    <div>
-                                        <h3 class="font-bold text-base text-slate-900 line-clamp-1 group-hover:text-emerald-700 transition-colors">
-                                            {{ $ad->titre }}
-                                        </h3>
-                                        <div class="flex items-baseline gap-1 mt-1.5">
-                                            <span class="text-xl font-extrabold text-emerald-700">{{ number_format($ad->prix, 0, ',', ' ') }}</span>
-                                            <span class="text-xs font-bold text-slate-400">FCFA</span>
-                                        </div>
-                                        <p class="text-xs text-slate-500 line-clamp-2 mt-2 leading-relaxed">
-                                            {{ $ad->description }}
-                                        </p>
-                                    </div>
-
-                                    <!-- Footer de la carte -->
-                                    <div class="pt-3 border-t border-slate-100 flex justify-between items-center w-full text-xs text-slate-500">
-                                        <div class="flex items-center gap-1 truncate text-slate-600 font-medium" title="{{ $ad->lieu }}">
-                                            <span class="material-symbols-outlined text-[15px] text-slate-400">location_on</span>
-                                            <span class="truncate">{{ $ad->lieu }}</span>
-                                        </div>
-                                        <div class="flex items-center gap-2 flex-shrink-0 ml-2">
-                                            <span class="flex items-center gap-1 text-[11px] font-medium text-slate-400 whitespace-nowrap" title="{{ $ad->created_at }}">
-                                                <span class="material-symbols-outlined text-[13px]">schedule</span>
-                                                <span>{{ $ad->formatted_date }}</span>
-                                            </span>
-                                            <!-- Formulaire de suppression -->
-                                            <form action="{{ route('annonces.destroy', $ad->id) }}" method="POST" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette annonce ?');" class="inline-flex">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="text-red-500 hover:text-red-700 font-bold inline-flex items-center p-1 rounded hover:bg-red-50 transition-colors" title="Supprimer l'annonce">
-                                                    <span class="material-symbols-outlined text-[18px]">delete</span>
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </div>
+                            <!-- Footer de la carte -->
+                            <div class="pt-3 border-t border-slate-100 flex justify-between items-center w-full text-xs text-slate-500">
+                                <div class="flex items-center gap-1 truncate text-slate-600 font-medium" title="{{ $ad->lieu }}">
+                                    <span class="material-symbols-outlined text-[15px] text-slate-400">location_on</span>
+                                    <span class="truncate">{{ $ad->lieu }}</span>
+                                </div>
+                                <div class="flex items-center gap-2 flex-shrink-0 ml-2">
+                                    <span class="flex items-center gap-1 text-[11px] font-medium text-slate-400 whitespace-nowrap" title="{{ $ad->created_at }}">
+                                        <span class="material-symbols-outlined text-[13px]">schedule</span>
+                                        <span>{{ $ad->formatted_date }}</span>
+                                    </span>
+                                    <!-- Formulaire de suppression -->
+                                    <form action="{{ route('annonces.destroy', $ad->id) }}" method="POST" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette annonce ?');" class="inline-flex">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="text-red-500 hover:text-red-700 font-bold inline-flex items-center p-1 rounded hover:bg-red-50 transition-colors" title="Supprimer l'annonce">
+                                            <span class="material-symbols-outlined text-[18px]">delete</span>
+                                        </button>
+                                    </form>
                                 </div>
                             </div>
-                        @endforeach
+                        </div>
                     </div>
+                    @endforeach
+                </div>
                 @endif
             </div>
 
@@ -873,9 +965,9 @@
                             <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight">Mon Profil</h1>
                             <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">
                                 @if(Auth::user()->email_verified_at)
-                                    ✓ Compte Vérifié
+                                ✓ Compte Vérifié
                                 @else
-                                    En attente de vérification
+                                En attente de vérification
                                 @endif
                             </span>
                         </div>
@@ -889,14 +981,14 @@
                 </div>
 
                 @if($errors->any())
-                    <div class="p-4 rounded-xl bg-red-50 border border-red-200 text-red-800 text-sm">
-                        <div class="font-bold mb-1">Des erreurs sont survenues :</div>
-                        <ul class="list-disc list-inside text-xs space-y-0.5">
-                            @foreach($errors->all() as $err)
-                                <li>{{ $err }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
+                <div class="p-4 rounded-xl bg-red-50 border border-red-200 text-red-800 text-sm">
+                    <div class="font-bold mb-1">Des erreurs sont survenues :</div>
+                    <ul class="list-disc list-inside text-xs space-y-0.5">
+                        @foreach($errors->all() as $err)
+                        <li>{{ $err }}</li>
+                        @endforeach
+                    </ul>
+                </div>
                 @endif
 
                 <form action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data" class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 sm:p-8 space-y-8" id="profile-form">
@@ -907,12 +999,12 @@
                         <div class="relative w-28 h-28 flex-shrink-0 mx-auto sm:mx-0">
                             <div class="w-28 h-28 rounded-full overflow-hidden ring-4 ring-emerald-500/30 bg-slate-100 shadow-md flex items-center justify-center">
                                 @if(Auth::user()->photo && file_exists(public_path(Auth::user()->photo)))
-                                    <img id="profile-preview-img" src="{{ asset(Auth::user()->photo) }}" alt="{{ Auth::user()->prenom }}" class="w-full h-full object-cover">
+                                <img id="profile-preview-img" src="{{ asset(Auth::user()->photo) }}" alt="{{ Auth::user()->prenom }}" class="w-full h-full object-cover">
                                 @else
-                                    <img id="profile-preview-img" src="" alt="Aperçu" class="w-full h-full object-cover hidden">
-                                    <div id="profile-avatar-fallback" class="w-full h-full bg-secondary text-white font-extrabold flex items-center justify-center text-3xl">
-                                        {{ strtoupper(substr(Auth::user()->prenom ?? 'U', 0, 1)) }}
-                                    </div>
+                                <img id="profile-preview-img" src="" alt="Aperçu" class="w-full h-full object-cover hidden">
+                                <div id="profile-avatar-fallback" class="w-full h-full bg-secondary text-white font-extrabold flex items-center justify-center text-3xl">
+                                    {{ strtoupper(substr(Auth::user()->prenom ?? 'U', 0, 1)) }}
+                                </div>
                                 @endif
                             </div>
                             <label for="profile-photo-input" class="absolute bottom-1 right-1 w-9 h-9 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white flex items-center justify-center shadow-lg cursor-pointer transition-transform hover:scale-110 ring-2 ring-white" title="Changer la photo de profil">
@@ -982,7 +1074,28 @@
                                 <input type="text" id="profile_adresse" name="adresse" value="{{ old('adresse', Auth::user()->adresse) }}" required maxlength="255" class="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none text-sm font-medium transition-all text-slate-800 bg-slate-50/50 focus:bg-white" placeholder="Ex: Tokoin Doumasséssé, Lomé, Togo">
                             </div>
                         </div>
-
+                        <!-- Genre -->
+                        <div class="space-y-1.5 sm:col-span-2">
+                            <label for="profile_genre" class="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+                                Genre <span class="text-red-500">*</span>
+                            </label>
+                            @php
+                                $currentGenre = old('genre', Auth::user()->genre);
+                            @endphp
+                            <div class="profile-select-wrapper relative">
+                                <span class="profile-select-icon-left">
+                                    <span class="material-symbols-outlined text-[18px]">person</span>
+                                </span>
+                                <select name="genre" id="profile_genre" class="profile-select-field w-full pl-11 pr-10 py-3 rounded-xl border border-slate-200 hover:border-slate-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none text-sm font-medium transition-all text-slate-800 bg-slate-50/50 focus:bg-white" required>
+                                    <option value="" disabled {{ empty($currentGenre) ? 'selected' : '' }}>Sélectionnez votre genre</option>
+                                    <option value="Masculin" {{ in_array($currentGenre, ['Masculin', 'Homme']) ? 'selected' : '' }}>Masculin</option>
+                                    <option value="Féminin" {{ in_array($currentGenre, ['Féminin', 'Femme']) ? 'selected' : '' }}>Féminin</option>
+                                </select>
+                                <span class="profile-select-chevron">
+                                    <span class="material-symbols-outlined text-[20px]">expand_more</span>
+                                </span>
+                            </div>
+                        </div>
                         <!-- Adresse e-mail (Lecture seule) -->
                         <div class="space-y-1.5 sm:col-span-2">
                             <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider">
@@ -1019,7 +1132,7 @@
     <!-- ================================================================= -->
     <div id="presubmit-modal" class="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-3xl max-w-xl w-full p-6 sm:p-8 shadow-2xl border border-slate-100 flex flex-col max-h-[90vh] overflow-y-auto no-scrollbar animate-scale-up">
-            
+
             <div class="flex items-center justify-between pb-3 border-b border-slate-100">
                 <div class="flex items-center gap-2">
                     <span class="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center">
@@ -1049,7 +1162,7 @@
                 <!-- Contenu dans la modale -->
                 <div class="p-5 space-y-3">
                     <h4 id="modal-title" class="text-lg font-extrabold text-slate-900">Titre de l'annonce</h4>
-                    
+
                     <div class="flex items-baseline gap-1">
                         <span id="modal-price" class="text-2xl font-black text-emerald-700">0</span>
                         <span class="text-xs font-bold text-slate-400">FCFA</span>
@@ -1160,7 +1273,10 @@
             document.getElementById('sidebar-backdrop').classList.add('hidden');
 
             window.location.hash = tabName;
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
         }
 
         // -------------------------------------------------------------
@@ -1202,7 +1318,10 @@
             const label = document.getElementById('step-validation-message');
             label.innerText = msg;
             banner.classList.remove('hidden');
-            banner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            banner.scrollIntoView({
+                behavior: 'smooth',
+                block: 'nearest'
+            });
         }
 
         function hideStepError() {
@@ -1215,9 +1334,21 @@
                 const titre = document.getElementById('input-titre').value.trim();
                 const cat = document.getElementById('input-categorie').value;
                 const lieu = document.getElementById('input-lieu').value.trim();
-                if (!titre) { showStepError("Veuillez saisir le titre de votre annonce."); document.getElementById('input-titre').focus(); return false; }
-                if (!cat) { showStepError("Veuillez sélectionner une catégorie."); document.getElementById('input-categorie').focus(); return false; }
-                if (!lieu) { showStepError("Veuillez indiquer un emplacement ou lieu."); document.getElementById('input-lieu').focus(); return false; }
+                if (!titre) {
+                    showStepError("Veuillez saisir le titre de votre annonce.");
+                    document.getElementById('input-titre').focus();
+                    return false;
+                }
+                if (!cat) {
+                    showStepError("Veuillez sélectionner une catégorie.");
+                    document.getElementById('input-categorie').focus();
+                    return false;
+                }
+                if (!lieu) {
+                    showStepError("Veuillez indiquer un emplacement ou lieu.");
+                    document.getElementById('input-lieu').focus();
+                    return false;
+                }
                 return true;
             } else if (step === 2) {
                 if (uploadedPhotos.length === 0) {
@@ -1252,7 +1383,9 @@
         function updateEtatUI() {
             const radios = document.getElementsByName('etat');
             let val = 'Neuf';
-            radios.forEach(r => { if (r.checked) val = r.value; });
+            radios.forEach(r => {
+                if (r.checked) val = r.value;
+            });
 
             const neufLabel = document.getElementById('label-etat-neuf');
             const usageLabel = document.getElementById('label-etat-usage');
@@ -1478,8 +1611,14 @@
         // 5. Pre-Submit Modal (Aperçu avant Publication)
         // -------------------------------------------------------------
         function openPreSubmitModal() {
-            if (!validateStep(1)) { goToStep(1); return; }
-            if (!validateStep(2)) { goToStep(2); return; }
+            if (!validateStep(1)) {
+                goToStep(1);
+                return;
+            }
+            if (!validateStep(2)) {
+                goToStep(2);
+                return;
+            }
 
             const prix = document.getElementById('input-prix').value;
             const desc = document.getElementById('input-description').value.trim();
@@ -1502,7 +1641,9 @@
 
             const radios = document.getElementsByName('etat');
             let etatVal = 'Neuf';
-            radios.forEach(r => { if (r.checked) etatVal = r.value; });
+            radios.forEach(r => {
+                if (r.checked) etatVal = r.value;
+            });
 
             document.getElementById('modal-title').innerText = titre;
             document.getElementById('modal-categorie-badge').innerText = cat;
@@ -1549,9 +1690,10 @@
             }
 
             // Traitement des chemins : s'il s'agit de strings relatives
+            const assetBaseUrl = "{{ asset('') }}";
             currentGalleryPhotos = photos.map(p => {
                 if (p.startsWith('http://') || p.startsWith('https://')) return p;
-                return '{{ asset('') }}' + p;
+                return assetBaseUrl + p;
             });
 
             currentGalleryIndex = 0;
@@ -1718,4 +1860,5 @@
         });
     </script>
 </body>
+
 </html>

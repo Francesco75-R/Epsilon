@@ -204,12 +204,9 @@
 
     <!-- Configuration globale Auth & Routes JS -->
     <script>
-        window.isUserLoggedIn = {
-            {
-                Auth::check() ? 'true' : 'false'
-            }
-        };
+        window.isUserLoggedIn = {{ Auth::check() ? 'true' : 'false' }};
         window.loginUrl = "{{ route('login') }}";
+        window.assetBaseUrl = "{{ asset('') }}";
     </script>
 
     <!-- Scripts Client -->
