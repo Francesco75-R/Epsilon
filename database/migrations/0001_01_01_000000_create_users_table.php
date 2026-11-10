@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('adresse', 255)->nullable();
             $table->string('genre', 10)->nullable();
             $table->string('photo', 255)->nullable();
-            $table->string('carte', 255)->nullable();
+            $table->string('profil', 15)->default('client');
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();

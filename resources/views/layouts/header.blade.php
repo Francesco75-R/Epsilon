@@ -2,12 +2,12 @@
 <!-- HEADER PRINCIPAL (Réorganisé, Moderne & Harmonieux)               -->
 <!-- ================================================================= -->
 <header class="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-xl border-b border-slate-200/80 shadow-[0_1px_12px_rgba(15,23,42,0.04)]">
-    <div class="h-20 max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4 lg:gap-6">
+    <div class="header-nav-container h-20 flex items-center justify-between gap-4 lg:gap-6">
 
         <!-- 1. GAUCHE: Logo officiel Epsilon & Navigation desktop -->
         <div class="flex items-center gap-6 lg:gap-8 flex-shrink-0">
             <!-- Logo & Marque -->
-            <a class="flex items-center gap-3 group" href="{{ url('/') }}" aria-label="Epsilon Accueil">
+            <a class="flex items-center gap-3 group" href="{{ route('home') }}" aria-label="Epsilon Accueil">
                 <svg class="h-8 w-auto object-contain" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <!-- Fond Bleu Marine -->
                     <rect width="100" height="100" rx="24" fill="#0A1128" />
@@ -32,10 +32,10 @@
 
             <!-- Liens de navigation (Grand écran) -->
             <nav class="hidden xl:flex items-center gap-1.5" aria-label="Menu principal">
-                <a aria-current="page" class="px-3.5 py-2 rounded-xl text-sm font-bold bg-slate-100 text-primary transition-all" href="{{ url('/') }}">
+                <a aria-current="page" class="px-3.5 py-2 rounded-xl text-sm font-bold bg-slate-100 text-primary transition-all" href="{{ route('home') }}">
                     Accueil
                 </a>
-                <a class="px-3.5 py-2 rounded-xl text-sm font-medium text-slate-600 hover:text-primary hover:bg-slate-50 transition-all" href="#listing-feed">
+                <a class="px-3.5 py-2 rounded-xl text-sm font-medium text-slate-600 hover:text-primary hover:bg-slate-50 transition-all" href="{{ route('home') }}#listing-feed">
                     Explorer
                 </a>
                 <a class="px-3.5 py-2 rounded-xl text-sm font-medium text-slate-600 hover:text-primary hover:bg-slate-50 transition-all" href="#">
@@ -96,11 +96,11 @@
                 <span class="material-symbols-outlined text-[22px]">search</span>
             </button>
 
-            <!-- Favoris avec badge interactif -->
-            <a class="relative p-2.5 rounded-xl hover:bg-slate-100 hover:text-primary text-slate-600 transition-colors flex items-center justify-center" href="#listing-feed" title="Mes Favoris" aria-label="Mes Favoris">
-                <span class="material-symbols-outlined text-[22px]">favorite</span>
-                <span id="fav-count-badge" class="absolute top-1.5 right-1.5 flex items-center justify-center w-4 h-4 bg-error text-white font-bold text-[10px] rounded-full shadow-sm">3</span>
-            </a>
+            <!-- Panier avec badge interactif -->
+            <button type="button" class="relative p-2.5 rounded-xl hover:bg-slate-100 hover:text-primary text-slate-600 transition-colors flex items-center justify-center cursor-pointer" onclick="openCartPreview()" title="Mon Panier" aria-label="Mon Panier">
+                <span class="material-symbols-outlined text-[22px]">shopping_cart</span>
+                <span class="header-cart-count absolute top-1.5 right-1.5 flex items-center justify-center min-w-4 h-4 px-1 bg-secondary text-white font-bold text-[10px] rounded-full shadow-sm hidden">0</span>
+            </button>
 
             <!-- Messagerie instantanée avec badge -->
             <a class="relative p-2.5 rounded-xl hover:bg-slate-100 hover:text-primary text-slate-600 transition-colors flex items-center justify-center" href="#" title="Messagerie" aria-label="Messagerie">

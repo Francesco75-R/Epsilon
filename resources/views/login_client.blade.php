@@ -9,7 +9,7 @@
     <div class="ambient-orb orb-2"></div>
 
     <!-- Bouton Retour au site -->
-    <a href="{{ url('/') }}" class="login-back">
+    <a href="{{ route('home') }}" class="login-back">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
             <line x1="19" y1="12" x2="5" y2="12" />
             <polyline points="12 19 5 12 12 5" />
@@ -23,7 +23,7 @@
         <div class="login-side">
             <div>
                 <div class="login-side-logo">
-                    <a href="{{ url('/') }}" style="text-decoration:none; display:flex; align-items:center;">
+                    <a href="{{ route('home') }}" style="text-decoration:none; display:flex; align-items:center;">
                         <div class="logo-icon">
                             <svg class="h-8 w-auto object-contain" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <!-- Fond Bleu Marine -->

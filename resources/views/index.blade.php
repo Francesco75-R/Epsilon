@@ -15,94 +15,96 @@
     <!-- ================================================================= -->
     <!-- 1. HERO SECTION (Moderne, Aéré & Épuré)                           -->
     <!-- ================================================================= -->
-    <section class="relative w-full bg-gradient-to-b from-surface-container-low via-surface-container-lowest to-surface overflow-hidden pt-10 pb-16 md:pt-16 md:pb-24 border-b border-outline-variant/20">
-        <!-- Halos lumineux ambiants -->
-        <div class="absolute -top-32 -left-20 w-96 h-96 bg-primary-fixed/25 rounded-full blur-3xl pointer-events-none"></div>
-        <div class="absolute top-10 right-0 w-[36rem] h-[36rem] bg-secondary-fixed/25 rounded-full blur-3xl pointer-events-none"></div>
+    <section class="hero-main-section w-full pt-10 pb-16 md:pt-16 md:pb-24 border-b border-outline-variant/20">
+        <!-- Arrière-plan de 5 images collées + fondu de lisibilité -->
+        @include('layouts.hero_images')
 
-        <div class="max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-10 relative z-10">
-            <!-- Badge statut national avec point animé -->
-            <div class="flex items-center mb-6">
-                <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/90 backdrop-blur-md text-secondary font-semibold text-xs sm:text-sm shadow-sm border border-secondary/20">
-                    <span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
-                    Place de marché nationale n°1 au Togo
-                </span>
-            </div>
-
-            <!-- Titre et sous-titre agrandis & aérés -->
-            <div class="max-w-4xl mb-10">
-                <h1 class="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-primary tracking-tight leading-[1.15] mb-4">
-                    Achetez et vendez près de chez vous <span class="text-secondary">en toute confiance.</span>
-                </h1>
-                <p class="text-base sm:text-lg lg:text-xl text-on-surface-variant max-w-2xl leading-relaxed">
-                    Des milliers de bonnes affaires vérifiées chaque jour. Transactions directes, locales et sécurisées entre particuliers et commerçants certifiés.
-                </p>
-            </div>
-
-            <!-- Barre de recherche flottante premium (100% Opérationnelle) -->
-            <form action="{{ route('home') }}" method="GET" class="bg-white p-2.5 sm:p-3 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.06)] max-w-4xl mb-8 border border-slate-200/80">
-                <div class="flex flex-col md:flex-row items-center gap-2">
-                    <!-- Recherche textuelle -->
-                    <div class="flex items-center flex-1 w-full px-3 py-2.5">
-                        <span class="material-symbols-outlined text-outline text-[22px] mr-2.5">search</span>
-                        <input class="w-full bg-transparent outline-none font-body-md text-sm sm:text-base text-on-surface placeholder:text-outline" id="hero-input" name="q" value="{{ request('q') }}" placeholder="Que recherchez-vous ? (ex: iPhone 15, Toyota, Studio...)" type="text" />
-                    </div>
-
-                    <!-- Séparateur vertical (desktop) -->
-                    <div class="hidden md:block w-px h-8 bg-slate-200"></div>
-
-                    <!-- Filtre catégorie -->
-                    <div class="flex items-center w-full md:w-auto px-3 py-2.5">
-                        <span class="material-symbols-outlined text-outline text-[20px] mr-2">category</span>
-                        <select name="categorie" class="bg-transparent outline-none font-medium text-xs sm:text-sm text-on-surface cursor-pointer pr-3" aria-label="Toutes catégories">
-                            <option value="">Toutes catégories</option>
-                            <option value="Véhicules" {{ request('categorie') == 'Véhicules' ? 'selected' : '' }}>Véhicules</option>
-                            <option value="Immobilier" {{ request('categorie') == 'Immobilier' ? 'selected' : '' }}>Immobilier</option>
-                            <option value="Smartphones & Tech" {{ request('categorie') == 'Smartphones & Tech' ? 'selected' : '' }}>Smartphones & Tech</option>
-                            <option value="Mode & Maison" {{ request('categorie') == 'Mode & Maison' ? 'selected' : '' }}>Mode & Maison</option>
-                            <option value="Emploi & Services" {{ request('categorie') == 'Emploi & Services' ? 'selected' : '' }}>Emploi & Services</option>
-                        </select>
-                    </div>
-
-                    <!-- Séparateur vertical (desktop) -->
-                    <div class="hidden md:block w-px h-8 bg-slate-200"></div>
-
-                    <!-- Sélecteur de ville -->
-                    <div class="flex items-center w-full md:w-auto px-3 py-2.5">
-                        <span class="material-symbols-outlined text-outline text-[20px] mr-2">location_on</span>
-                        <select name="lieu" class="bg-transparent outline-none font-medium text-xs sm:text-sm text-on-surface cursor-pointer pr-3" aria-label="Choisir la ville">
-                            <option value="">Tout le Togo</option>
-                            <option value="Lomé" {{ request('lieu') == 'Lomé' ? 'selected' : '' }}>Lomé</option>
-                            <option value="Kara" {{ request('lieu') == 'Kara' ? 'selected' : '' }}>Kara</option>
-                            <option value="Sokodé" {{ request('lieu') == 'Sokodé' ? 'selected' : '' }}>Sokodé</option>
-                            <option value="Kpalimé" {{ request('lieu') == 'Kpalimé' ? 'selected' : '' }}>Kpalimé</option>
-                            <option value="Atakpamé" {{ request('lieu') == 'Atakpamé' ? 'selected' : '' }}>Atakpamé</option>
-                        </select>
-                    </div>
-
-                    <!-- Bouton d'action CTA vert émeraude -->
-                    <button class="w-full md:w-auto flex items-center justify-center gap-2 bg-secondary hover:bg-on-secondary-container text-on-secondary font-semibold text-sm sm:text-base px-6 py-3.5 rounded-xl shadow-md hover:shadow-lg transition-all cursor-pointer flex-shrink-0" type="submit">
-                        <span>Rechercher</span>
-                        <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
-                    </button>
+        <div class="hero-section-container">
+            <!-- Contenu au premier plan (z-index: 3, max-width: 650px) -->
+            <div class="hero-foreground-content">
+                <!-- Badge statut national avec point animé -->
+                <div class="flex items-center mb-5">
+                    <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/95 backdrop-blur-md text-secondary font-semibold text-xs sm:text-sm shadow-sm border border-secondary/20">
+                        <span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
+                        Place de marché nationale n°1 au Togo
+                    </span>
                 </div>
-            </form>
 
-            <!-- Mots-clés tendances (Pills cliquables) -->
-            <div class="flex flex-wrap items-center gap-2 mb-10">
-                <span class="text-xs sm:text-sm font-semibold text-on-surface-variant flex items-center gap-1 mr-1">
-                    <span class="material-symbols-outlined text-[16px] text-secondary">trending_up</span> Tendances :
-                </span>
-                <button class="px-3.5 py-1.5 bg-white hover:bg-slate-100 rounded-full text-xs sm:text-sm font-medium text-primary transition-all border border-slate-200/80 shadow-2xs cursor-pointer" onclick="setSearchTerm('Toyota Corolla')">Toyota Corolla</button>
-                <button class="px-3.5 py-1.5 bg-white hover:bg-slate-100 rounded-full text-xs sm:text-sm font-medium text-primary transition-all border border-slate-200/80 shadow-2xs cursor-pointer" onclick="setSearchTerm('iPhone 15 Pro')">iPhone 15 Pro</button>
-                <button class="px-3.5 py-1.5 bg-white hover:bg-slate-100 rounded-full text-xs sm:text-sm font-medium text-primary transition-all border border-slate-200/80 shadow-2xs cursor-pointer" onclick="setSearchTerm('Villa avec piscine')">Villa avec piscine</button>
-                <button class="px-3.5 py-1.5 bg-white hover:bg-slate-100 rounded-full text-xs sm:text-sm font-medium text-primary transition-all border border-slate-200/80 shadow-2xs cursor-pointer" onclick="setSearchTerm('MacBook Air M2')">MacBook Air M2</button>
-                <button class="px-3.5 py-1.5 bg-white hover:bg-slate-100 rounded-full text-xs sm:text-sm font-medium text-primary transition-all border border-slate-200/80 shadow-2xs cursor-pointer" onclick="setSearchTerm('Appartement Lomé 2')">Appartement Lomé 2</button>
+                <!-- Titre et sous-titre agrandis & aérés -->
+                <div class="mb-8">
+                    <h1 class="hero-title text-3xl sm:text-4xl xl:text-5xl font-extrabold text-white tracking-tight leading-[1.15] mb-4">
+                        Achetez et vendez près de chez vous <span class="hero-title-highlight text-emerald-400">en toute confiance.</span>
+                    </h1>
+                    <p class="hero-subtitle text-base sm:text-lg text-slate-100 font-medium leading-relaxed">
+                        Des milliers de bonnes affaires vérifiées chaque jour. Transactions directes, locales et sécurisées entre particuliers et commerçants certifiés.
+                    </p>
+                </div>
+
+                <!-- Barre de recherche flottante premium (100% Opérationnelle) -->
+                <form action="{{ route('home') }}" method="GET" class="hero-search-form bg-white p-2 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.06)] mb-6 border border-slate-200/80">
+                    <div class="flex flex-col md:flex-row items-center gap-1">
+                        <!-- Recherche textuelle -->
+                        <div class="hero-search-input-box flex items-center flex-1 w-full px-2 py-2">
+                            <span class="material-symbols-outlined text-outline text-[20px] mr-1.5">search</span>
+                            <input class="w-full bg-transparent outline-none font-body-md text-xs sm:text-sm text-on-surface placeholder:text-outline" id="hero-input" name="q" value="{{ request('q') }}" placeholder="Que recherchez-vous ?" type="text" />
+                        </div>
+
+                        <!-- Séparateur vertical (desktop) -->
+                        <div class="hidden md:block w-px h-7 bg-slate-200"></div>
+
+                        <!-- Filtre catégorie -->
+                        <div class="flex items-center w-full md:w-auto px-1.5 py-2 flex-shrink-0">
+                            <span class="material-symbols-outlined text-outline text-[18px] mr-1">category</span>
+                            <select name="categorie" class="bg-transparent outline-none font-medium text-xs text-on-surface cursor-pointer pr-1" aria-label="Toutes catégories">
+                                <option value="">Toutes catégories</option>
+                                <option value="Véhicules" {{ request('categorie') == 'Véhicules' ? 'selected' : '' }}>Véhicules</option>
+                                <option value="Immobilier" {{ request('categorie') == 'Immobilier' ? 'selected' : '' }}>Immobilier</option>
+                                <option value="Smartphones & Tech" {{ request('categorie') == 'Smartphones & Tech' ? 'selected' : '' }}>Smartphones & Tech</option>
+                                <option value="Mode & Maison" {{ request('categorie') == 'Mode & Maison' ? 'selected' : '' }}>Mode & Maison</option>
+                                <option value="Emploi & Services" {{ request('categorie') == 'Emploi & Services' ? 'selected' : '' }}>Emploi & Services</option>
+                            </select>
+                        </div>
+
+                        <!-- Séparateur vertical (desktop) -->
+                        <div class="hidden md:block w-px h-7 bg-slate-200"></div>
+
+                        <!-- Sélecteur de ville -->
+                        <div class="flex items-center w-full md:w-auto px-1.5 py-2 flex-shrink-0">
+                            <span class="material-symbols-outlined text-outline text-[18px] mr-1">location_on</span>
+                            <select name="lieu" class="bg-transparent outline-none font-medium text-xs text-on-surface cursor-pointer pr-1" aria-label="Choisir la ville">
+                                <option value="">Tout le Togo</option>
+                                <option value="Lomé" {{ request('lieu') == 'Lomé' ? 'selected' : '' }}>Lomé</option>
+                                <option value="Kara" {{ request('lieu') == 'Kara' ? 'selected' : '' }}>Kara</option>
+                                <option value="Sokodé" {{ request('lieu') == 'Sokodé' ? 'selected' : '' }}>Sokodé</option>
+                                <option value="Kpalimé" {{ request('lieu') == 'Kpalimé' ? 'selected' : '' }}>Kpalimé</option>
+                                <option value="Atakpamé" {{ request('lieu') == 'Atakpamé' ? 'selected' : '' }}>Atakpamé</option>
+                            </select>
+                        </div>
+
+                        <!-- Bouton d'action CTA vert émeraude -->
+                        <button class="w-full md:w-auto flex items-center justify-center gap-1.5 bg-secondary hover:bg-on-secondary-container text-on-secondary font-semibold text-xs sm:text-sm px-4 py-2.5 rounded-xl shadow-md hover:shadow-lg transition-all cursor-pointer flex-shrink-0" type="submit">
+                            <span>Rechercher</span>
+                            <span class="material-symbols-outlined text-[17px]">arrow_forward</span>
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Mots-clés tendances (Pills cliquables sur une seule ligne) -->
+                <div class="hero-trends-row mb-10">
+                    <span class="hero-trends-label text-xs font-semibold text-white flex items-center gap-1 mr-1">
+                        <span class="material-symbols-outlined text-[15px] text-emerald-400">trending_up</span> Tendances :
+                    </span>
+                    <button class="hero-trend-pill bg-white/95 hover:bg-slate-100 rounded-full text-xs font-medium text-primary transition-all border border-slate-200/80 shadow-2xs cursor-pointer" onclick="setSearchTerm('Toyota Corolla')">Toyota Corolla</button>
+                    <button class="hero-trend-pill bg-white/95 hover:bg-slate-100 rounded-full text-xs font-medium text-primary transition-all border border-slate-200/80 shadow-2xs cursor-pointer" onclick="setSearchTerm('iPhone 15 Pro')">iPhone 15 Pro</button>
+                    <button class="hero-trend-pill bg-white/95 hover:bg-slate-100 rounded-full text-xs font-medium text-primary transition-all border border-slate-200/80 shadow-2xs cursor-pointer" onclick="setSearchTerm('Villa avec piscine')">Villa avec piscine</button>
+                    <button class="hero-trend-pill bg-white/95 hover:bg-slate-100 rounded-full text-xs font-medium text-primary transition-all border border-slate-200/80 shadow-2xs cursor-pointer" onclick="setSearchTerm('MacBook Air M2')">MacBook Air M2</button>
+                    <button class="hero-trend-pill bg-white/95 hover:bg-slate-100 rounded-full text-xs font-medium text-primary transition-all border border-slate-200/80 shadow-2xs cursor-pointer" onclick="setSearchTerm('Appartement Lomé 2')">Appartement Lomé 2</button>
+                </div>
             </div>
 
             <!-- Métriques de réassurance claires & aérées -->
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6 pt-4">
-                <div class="flex items-center gap-4 p-4 md:p-5 rounded-2xl bg-white/95 shadow-sm border border-slate-200/70 hover:shadow-md transition-shadow">
+            <div class="hero-metrics-grid grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6 pt-4">
+                <div class="flex items-center gap-4 p-4 md:p-5 rounded-2xl bg-white/95 backdrop-blur-sm shadow-sm border border-slate-200/70 hover:shadow-md transition-shadow">
                     <div class="w-12 h-12 rounded-xl bg-secondary-container/40 flex items-center justify-center text-secondary flex-shrink-0">
                         <span class="material-symbols-outlined text-[28px]">inventory_2</span>
                     </div>
@@ -111,7 +113,7 @@
                         <p class="text-xs sm:text-sm text-on-surface-variant mt-1">Annonces actives et modérées</p>
                     </div>
                 </div>
-                <div class="flex items-center gap-4 p-4 md:p-5 rounded-2xl bg-white/95 shadow-sm border border-slate-200/70 hover:shadow-md transition-shadow">
+                <div class="flex items-center gap-4 p-4 md:p-5 rounded-2xl bg-white/95 backdrop-blur-sm shadow-sm border border-slate-200/70 hover:shadow-md transition-shadow">
                     <div class="w-12 h-12 rounded-xl bg-primary-fixed/50 flex items-center justify-center text-primary flex-shrink-0">
                         <span class="material-symbols-outlined text-[28px]">verified_user</span>
                     </div>
@@ -120,7 +122,7 @@
                         <p class="text-xs sm:text-sm text-on-surface-variant mt-1">Identité vérifiée à 100%</p>
                     </div>
                 </div>
-                <div class="flex items-center gap-4 p-4 md:p-5 rounded-2xl bg-white/95 shadow-sm border border-slate-200/70 hover:shadow-md transition-shadow">
+                <div class="flex items-center gap-4 p-4 md:p-5 rounded-2xl bg-white/95 backdrop-blur-sm shadow-sm border border-slate-200/70 hover:shadow-md transition-shadow">
                     <div class="w-12 h-12 rounded-xl bg-secondary-fixed/40 flex items-center justify-center text-secondary flex-shrink-0">
                         <span class="material-symbols-outlined text-[28px]">toll</span>
                     </div>
@@ -233,7 +235,7 @@
     <!-- ================================================================= -->
     <section class="w-full py-14 md:py-20 bg-surface-container-low/70 border-y border-outline-variant/20" id="listing-feed">
         <!-- Conteneur avec marge de 1 cm à gauche et 1 cm à droite (sans modifier haut/bas) -->
-        <div class="product-section-wrapper" style="margin-left: 1cm; margin-right: 1cm;">
+        <div class="product-section-wrapper">
             <div class="max-w-[1400px] mx-auto">
                 <!-- En-tête des annonces & Onglets de filtrage -->
                 <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10">
@@ -272,23 +274,28 @@
                             };
 
                             $photos = is_array($ad->photos) ? $ad->photos : (is_string($ad->photos) ? json_decode($ad->photos, true) ?? [] : []);
-                            $cover = !empty($photos) ? $photos[0] : null;
-                            $coverUrl = $cover ? (str_starts_with($cover, 'http') ? $cover : asset($cover)) : asset('photo/default.png');
-                            $photoCount = count($photos);
+                            $photoUrls = array_values(array_map(fn($p) => str_starts_with($p, 'http') ? $p : asset(ltrim($p, '/')), $photos));
+                            $coverUrl = !empty($photoUrls) ? $photoUrls[0] : asset('photo/default.png');
+                            $photoCount = count($photoUrls);
                         @endphp
 
-                        <div class="listing-item product-card group bg-white rounded-2xl border border-slate-200/80 hover:border-secondary/40 shadow-[0_2px_12px_rgba(15,23,42,0.04)] hover:shadow-[0_16px_32px_rgba(15,23,42,0.09)] transition-all duration-300 hover:-translate-y-1.5 flex flex-col overflow-hidden" data-cat="{{ $catSlug }}">
+                        <div class="listing-item product-card group bg-white rounded-2xl border border-slate-200/80 hover:border-secondary/40 shadow-[0_2px_12px_rgba(15,23,42,0.04)] hover:shadow-[0_16px_32px_rgba(15,23,42,0.09)] transition-all duration-300 hover:-translate-y-1.5 flex flex-col overflow-hidden cursor-pointer" 
+                             data-cat="{{ $catSlug }}"
+                             data-ad-id="{{ $ad->id }}"
+                             data-ad-titre="{{ $ad->titre }}"
+                             data-ad-prix="{{ $ad->prix }}"
+                             data-ad-photo="{{ $coverUrl }}"
+                             data-ad-lieu="{{ $ad->lieu }}"
+                             data-ad-categorie="{{ $ad->categorie }}"
+                             onclick="handleAdCardClick(this)">
                             <!-- Image / Vignette (Uniquement photos[0]) -->
                             <div class="relative w-full h-56 sm:h-52 md:h-60 overflow-hidden bg-slate-100">
-                                <img class="product-card-img w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out cursor-pointer" 
+                                <img class="product-card-img w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out" 
                                      alt="{{ $ad->titre }}" 
                                      src="{{ $coverUrl }}" 
-                                     data-photos="{{ e(json_encode($photos)) }}"
-                                     data-titre="{{ $ad->titre }}"
-                                     onclick="openGalleryFromElement(this)" 
                                      loading="lazy" />
                                 
-                                <div class="absolute top-3 left-3 flex flex-wrap gap-1.5">
+                                <div class="absolute top-3 left-3 flex flex-wrap gap-1.5 pointer-events-none">
                                     <span class="bg-secondary text-white px-2.5 py-1 rounded-lg text-xs font-bold shadow-sm flex items-center gap-1">
                                         {{ $ad->categorie }}
                                     </span>
@@ -297,17 +304,17 @@
                                     </span>
                                 </div>
 
-                                <!-- Bouton Favoris -->
-                                <button class="fav-btn absolute top-3 right-3 w-9 h-9 rounded-full bg-white/90 backdrop-blur-md hover:bg-white flex items-center justify-center text-slate-500 hover:text-error transition-all shadow-sm hover:scale-110 cursor-pointer" onclick="toggleFav(this)" title="Ajouter aux favoris">
+                                <!-- Bouton Favoris (Redirige vers login_client si deconnecte) -->
+                                <button type="button" class="fav-btn absolute top-3 right-3 w-9 h-9 rounded-full bg-white/90 backdrop-blur-md hover:bg-white flex items-center justify-center text-slate-500 hover:text-error transition-all shadow-sm hover:scale-110 cursor-pointer z-10" onclick="event.stopPropagation(); toggleFav(this);" title="Ajouter aux favoris">
                                     <span class="material-symbols-outlined text-[20px]">favorite</span>
                                 </button>
 
-                                <!-- Bouton Photos (Exigence: Petit lien/bouton nommé "Photos" qui ouvre la modale galerie) -->
+                                <!-- Bouton Photos (Affiche toutes les photos pour tous, connecte ou non) -->
                                 <button type="button" 
-                                        data-photos="{{ e(json_encode($photos)) }}"
+                                        data-photos="{{ json_encode($photoUrls) }}"
                                         data-titre="{{ $ad->titre }}"
-                                        onclick="openGalleryFromElement(this)"
-                                        class="absolute bottom-3 right-3 bg-slate-900/85 hover:bg-secondary text-white text-xs font-bold px-3 py-1.5 rounded-xl backdrop-blur-md shadow-md inline-flex items-center gap-1.5 transition-all cursor-pointer hover:scale-105">
+                                        onclick="event.stopPropagation(); openGalleryFromElement(this);"
+                                        class="absolute bottom-3 right-3 bg-slate-900/85 hover:bg-secondary text-white text-xs font-bold px-3 py-1.5 rounded-xl backdrop-blur-md shadow-md inline-flex items-center gap-1.5 transition-all cursor-pointer hover:scale-105 z-10">
                                     <span class="material-symbols-outlined text-[16px] text-secondary-fixed">photo_library</span>
                                     <span>Photos ({{ $photoCount }})</span>
                                 </button>
@@ -341,7 +348,7 @@
                                         </span>
                                         @if($ad->user)
                                             <span class="text-slate-300">•</span>
-                                            <a href="{{ route('page_client', ['id' => $ad->user_id]) }}" class="inline-flex items-center gap-1 font-semibold text-secondary hover:text-primary transition-colors text-xs truncate max-w-[100px]" title="Voir la boutique / profil de {{ $ad->user->prenom }}">
+                                            <a href="{{ route('page_client', ['id' => $ad->user_id]) }}" onclick="event.stopPropagation();" class="inline-flex items-center gap-1 font-semibold text-secondary hover:text-primary transition-colors text-xs truncate max-w-[100px]" title="Voir la boutique / profil de {{ $ad->user->prenom }}">
                                                 <span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
                                                 <span>{{ $ad->user->prenom }}</span>
                                             </a>
@@ -582,13 +589,13 @@
     <nav class="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-t border-slate-200/90 py-2 px-3 shadow-[0_-2px_12px_rgba(0,0,0,0.06)]" aria-label="Navigation mobile">
         <div class="max-w-md mx-auto flex items-center justify-around">
             <!-- 1. Accueil -->
-            <a href="{{ url('/') }}" class="flex flex-col items-center justify-center text-secondary py-1 px-2 transition-colors">
+            <a href="{{ route('home') }}" class="flex flex-col items-center justify-center text-secondary py-1 px-2 transition-colors">
                 <span class="material-symbols-outlined text-[24px]">home</span>
                 <span class="text-[11px] font-bold mt-0.5">Accueil</span>
             </a>
 
             <!-- 2. Explorer -->
-            <a href="#listing-feed" class="flex flex-col items-center justify-center text-slate-500 hover:text-primary py-1 px-2 transition-colors">
+            <a href="{{ route('home') }}#listing-feed" class="flex flex-col items-center justify-center text-slate-500 hover:text-primary py-1 px-2 transition-colors">
                 <span class="material-symbols-outlined text-[24px]">search</span>
                 <span class="text-[11px] font-medium mt-0.5">Explorer</span>
             </a>

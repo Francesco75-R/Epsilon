@@ -104,7 +104,7 @@
     <div class="auth-page">
         <div class="auth-container">
             <!-- Logo Epsilon -->
-            <a href="{{ url('/') }}" class="auth-brand" aria-label="Epsilon Accueil">
+            <a href="{{ route('home') }}" class="auth-brand" aria-label="Epsilon Accueil">
                 <svg width="38" height="38" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <rect width="100" height="100" rx="24" fill="#0A1128" />
                     <path d="M30 35H66C66 37.7614 63.7614 40 61 40H44V49H57C59.7614 49 62 51.2386 62 54C62 56.7614 59.7614 59 57 59H44V68H66C68.7614 68 71 70.2386 71 73C71 75.7614 68.7614 78 66 78H35C31.134 78 28 74.866 28 71V40C28 37.2386 30 35 30 35Z" fill="#FFFFFF" />

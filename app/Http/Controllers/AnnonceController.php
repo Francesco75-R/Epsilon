@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Annonce;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Exception;
 
 class AnnonceController extends Controller
@@ -114,10 +115,35 @@ class AnnonceController extends Controller
      */
     public function dashboard(Request $request)
     {
+        /** @var User $user */
         $user = Auth::user();
+        $user->syncVerificationStatus();
+
+        // Si un compte client (ou non vérifié) tente d'accéder à la création d'annonce via ?tab=publier
+        if ($request->query('tab') === 'publier' && !$user->canPublishAnnonce()) {
+            return redirect()->route('verification.create')
+                ->with('error', 'Vous devez avoir un compte vendeur vérifié pour pouvoir publier des annonces.');
+        }
+
         $myAnnonces = Annonce::where('user_id', Auth::id())->latest()->get();
 
         return view('dashboard', compact('user', 'myAnnonces'));
+    }
+
+    /**
+     * Accès au formulaire de création d'annonce :
+     * Redirige vers la vérification si l'utilisateur n'est pas un vendeur vérifié avec carte renseignée.
+     */
+    public function create()
+    {
+        $user = Auth::user();
+
+        if (!$user || !$user->canPublishAnnonce()) {
+            return redirect()->route('verification.create')
+                ->with('error', 'Vous devez avoir un compte vendeur vérifié pour pouvoir publier des annonces.');
+        }
+
+        return redirect()->route('dashboard', ['tab' => 'publier']);
     }
 
     /**
@@ -157,6 +183,14 @@ class AnnonceController extends Controller
      */
     public function store(Request $request)
     {
+        $user = Auth::user();
+
+        // Restriction stricte : seul un compte vendeur vérifié avec carte renseignée peut publier
+        if (!$user || !$user->canPublishAnnonce()) {
+            return redirect()->route('verification.create')
+                ->with('error', 'Vous devez avoir un compte vendeur vérifié pour pouvoir publier des annonces.');
+        }
+
         $messages = [
             'titre.required' => 'Le titre de l\'annonce est obligatoire.',
             'titre.max' => 'Le titre ne peut dépasser 150 caractères.',
@@ -224,36 +258,102 @@ class AnnonceController extends Controller
                 'description' => trim($request->description),
             ]);
 
+            if (request()->expectsJson() || request()->is('api/*')) {
+                return response()->json([
+                    'status' => 'success',
+                    'code' => 201,
+                    'message' => 'Félicitations ! Votre annonce « ' . $annonce->titre . ' » a été publiée avec succès.',
+                    'data' => $annonce,
+                ], 201);
+            }
+
             return redirect()->route('dashboard', ['tab' => 'mes-annonces'])
                 ->with('success', 'Félicitations ! Votre annonce « ' . $annonce->titre . ' » a été publiée avec succès.');
 
         } catch (Exception $e) {
+            Log::error('Erreur publication annonce : ' . $e->getMessage(), ['exception' => $e]);
+
+            if (request()->expectsJson() || request()->is('api/*')) {
+                return response()->json([
+                    'status' => 'error',
+                    'code' => 500,
+                    'message' => 'Une erreur interne est survenue lors de la publication de votre annonce.'
+                ], 500);
+            }
+
             return redirect()->back()
                 ->withInput()
-                ->with('error', 'Erreur lors de la publication : ' . $e->getMessage());
+                ->with('error', 'Une erreur inattendue est survenue lors de la publication de votre annonce. Veuillez réessayer.');
         }
     }
 
     /**
      * Suppression d'une annonce appartenant à l'utilisateur connecté.
+     * Gère explicitement 404 (Introuvable), 403 (Non autorisé) et 500 (Erreur serveur).
      */
     public function destroy($id)
     {
-        $annonce = Annonce::where('user_id', Auth::id())->findOrFail($id);
+        $annonce = Annonce::find($id);
 
-        // Suppression des fichiers physiques des photos
-        if (is_array($annonce->photos)) {
-            foreach ($annonce->photos as $path) {
-                $fullPath = public_path($path);
-                if (file_exists($fullPath) && is_file($fullPath)) {
-                    @unlink($fullPath);
-                }
+        if (!$annonce) {
+            if (request()->expectsJson() || request()->is('api/*')) {
+                return response()->json([
+                    'status' => 'error',
+                    'code' => 404,
+                    'message' => 'L\'annonce demandée est introuvable ou a déjà été supprimée.'
+                ], 404);
             }
+            abort(404, 'L\'annonce demandée est introuvable.');
         }
 
-        $annonce->delete();
+        // Vérification d'autorisation (403 Forbidden)
+        if ($annonce->user_id !== Auth::id()) {
+            if (request()->expectsJson() || request()->is('api/*')) {
+                return response()->json([
+                    'status' => 'error',
+                    'code' => 403,
+                    'message' => 'Action non autorisée. Vous n\'êtes pas le propriétaire de cette annonce.'
+                ], 403);
+            }
+            abort(403, 'Action non autorisée. Vous n\'avez pas les droits pour supprimer cette annonce.');
+        }
 
-        return redirect()->route('dashboard', ['tab' => 'mes-annonces'])
-            ->with('success', 'L\'annonce a été supprimée avec succès.');
+        try {
+            // Suppression des fichiers physiques des photos
+            if (is_array($annonce->photos)) {
+                foreach ($annonce->photos as $path) {
+                    $fullPath = public_path($path);
+                    if (file_exists($fullPath) && is_file($fullPath)) {
+                        @unlink($fullPath);
+                    }
+                }
+            }
+
+            $annonce->delete();
+
+            if (request()->expectsJson() || request()->is('api/*')) {
+                return response()->json([
+                    'status' => 'success',
+                    'code' => 200,
+                    'message' => 'L\'annonce a été supprimée avec succès.'
+                ], 200);
+            }
+
+            return redirect()->route('dashboard', ['tab' => 'mes-annonces'])
+                ->with('success', 'L\'annonce a été supprimée avec succès.');
+        } catch (\Throwable $e) {
+            Log::error('Erreur suppression annonce ID ' . $id . ' : ' . $e->getMessage(), ['exception' => $e]);
+
+            if (request()->expectsJson() || request()->is('api/*')) {
+                return response()->json([
+                    'status' => 'error',
+                    'code' => 500,
+                    'message' => 'Une erreur interne est survenue lors de la suppression de l\'annonce.'
+                ], 500);
+            }
+
+            return redirect()->route('dashboard', ['tab' => 'mes-annonces'])
+                ->with('error', 'Une erreur inattendue est survenue lors de la suppression de l\'annonce.');
+        }
     }
 }

@@ -2,12 +2,12 @@
 <!-- HEADER PRINCIPAL (Réorganisé, Moderne & Harmonieux)               -->
 <!-- ================================================================= -->
 <header class="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-xl border-b border-slate-200/80 shadow-[0_1px_12px_rgba(15,23,42,0.04)]">
-    <div class="h-20 max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4 lg:gap-6">
+    <div class="header-nav-container h-20 flex items-center justify-between gap-4 lg:gap-6">
 
         <!-- 1. GAUCHE: Logo officiel Epsilon & Navigation desktop -->
         <div class="flex items-center gap-6 lg:gap-8 flex-shrink-0">
             <!-- Logo & Marque -->
-            <a class="flex items-center gap-3 group" href="{{ url('/') }}" aria-label="Epsilon Accueil">
+            <a class="flex items-center gap-3 group" href="{{ route('home') }}" aria-label="Epsilon Accueil">
                 <svg class="h-8 w-auto object-contain" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <!-- Fond Bleu Marine -->
                     <rect width="100" height="100" rx="24" fill="#0A1128" />
@@ -32,10 +32,10 @@
 
             <!-- Liens de navigation (Grand écran) -->
             <nav class="hidden xl:flex items-center gap-1.5" aria-label="Menu principal">
-                <a aria-current="page" class="px-3.5 py-2 rounded-xl text-sm font-bold bg-slate-100 text-primary transition-all" href="{{ url('/') }}">
+                <a aria-current="page" class="px-3.5 py-2 rounded-xl text-sm font-bold bg-slate-100 text-primary transition-all" href="{{ route('home') }}">
                     Accueil
                 </a>
-                <a class="px-3.5 py-2 rounded-xl text-sm font-medium text-slate-600 hover:text-primary hover:bg-slate-50 transition-all" href="#listing-feed">
+                <a class="px-3.5 py-2 rounded-xl text-sm font-medium text-slate-600 hover:text-primary hover:bg-slate-50 transition-all" href="{{ route('home') }}#listing-feed">
                     Explorer
                 </a>
                 <a class="px-3.5 py-2 rounded-xl text-sm font-medium text-slate-600 hover:text-primary hover:bg-slate-50 transition-all" href="#">
@@ -89,16 +89,34 @@
             </button>
         </form>
 
-        <!-- 3. DROITE: Actions utilisateur, Favoris, Messagerie, Bouton CTA & Profil -->
+        <!-- 3. DROITE: Actions utilisateur, Panier, Profil & Connexion -->
         <div class="flex items-center gap-2.5 sm:gap-3 flex-shrink-0">
             <!-- Bouton recherche sur mobile (déploie la barre mobile) -->
-            <button class="md:hidden p-2.5 rounded-xl hover:bg-slate-100 text-slate-600 transition-colors flex items-center justify-center" type="button" onclick="toggleMobileSearch()" aria-label="Ouvrir la recherche mobile">
+            <button class="md:hidden p-2.5 rounded-xl hover:bg-slate-100 text-slate-600 transition-colors flex items-center justify-center cursor-pointer" type="button" onclick="toggleMobileSearch()" aria-label="Ouvrir la recherche mobile">
                 <span class="material-symbols-outlined text-[22px]">search</span>
             </button>
+
+            <!-- Icône Panier Flottant avec Compteur dynamique -->
+            <button type="button" onclick="showToast('Votre panier est synchronisé ! Cliquez sur une annonce pour ajouter des articles.', 'info')" class="relative p-2.5 rounded-xl text-slate-700 hover:text-secondary hover:bg-slate-100 transition-all cursor-pointer flex items-center justify-center" title="Mon Panier Epsilon">
+                <span class="material-symbols-outlined text-[24px]">shopping_cart</span>
+                <span class="header-cart-count hidden absolute -top-1 -right-1 bg-emerald-600 text-white font-extrabold text-[10px] w-5 h-5 rounded-full flex items-center justify-center ring-2 ring-white shadow-sm">0</span>
+            </button>
+
+            @auth
+            <!-- Profil Membre Connecté -->
+            <a class="inline-flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-primary font-bold text-xs sm:text-sm px-3.5 py-2.5 rounded-xl transition-all" href="{{ route('dashboard') }}" title="Accéder à mon espace membre">
+                <div class="w-6 h-6 rounded-full bg-secondary text-white font-bold flex items-center justify-center text-[11px]">
+                    {{ strtoupper(substr(Auth::user()->prenom ?? 'U', 0, 1)) }}
+                </div>
+                <span class="hidden sm:inline">{{ Auth::user()->prenom }}</span>
+            </a>
+            @else
+            <!-- Bouton Se Connecter -->
             <a class="inline-flex items-center gap-2 bg-secondary hover:bg-[#0A1128] text-white font-bold text-sm px-4 py-2.5 rounded-xl shadow-md hover:shadow-lg transition-all duration-200 ease-out hover:scale-105 active:scale-95" href="{{ route('login') }}" title="Se connecter">
                 <span class="material-symbols-outlined text-[20px]">person</span>
                 <span>Se connecter</span>
             </a>
+            @endauth
         </div>
     </div>
 

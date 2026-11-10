@@ -229,7 +229,11 @@ $myAnnonces = $myAnnonces ?? collect();
                 </div>
                 <div class="flex flex-col min-w-0">
                     <span class="font-bold text-sm text-on-surface truncate">{{ Auth::user()->prenom }} {{ Auth::user()->nom }}</span>
-                    <span class="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full w-max mt-0.5">Membre Vérifié</span>
+                    @if(($user->profil ?? 'client') === 'vendeur')
+                    <span class="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full w-max mt-0.5">Compte Vendeur</span>
+                    @else
+                    <span class="text-[11px] font-semibold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full w-max mt-0.5">Compte Client</span>
+                    @endif
                 </div>
             </div>
 
@@ -483,11 +487,15 @@ $myAnnonces = $myAnnonces ?? collect();
                                             </span>
                                         </td>
                                         <td class="py-3 px-3 text-right whitespace-nowrap">
+                                            @php
+                                                $itemPhotos = is_array($item->photos) ? $item->photos : (is_string($item->photos) ? json_decode($item->photos, true) ?? [] : []);
+                                                $itemPhotoUrls = array_values(array_map(fn($p) => str_starts_with($p, 'http') ? $p : asset(ltrim($p, '/')), $itemPhotos));
+                                            @endphp
                                             <div class="inline-flex items-center gap-1.5">
                                                 <!-- Bouton Photos Modal -->
-                                                <button type="button" data-photos="{{ e(json_encode($item->photos)) }}" data-titre="{{ $item->titre }}" onclick="openGalleryFromElement(this)" class="px-2.5 py-1 text-xs font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-lg inline-flex items-center gap-1 transition-colors" title="Voir les photos de l'annonce">
+                                                <button type="button" data-photos="{{ json_encode($itemPhotoUrls) }}" data-titre="{{ $item->titre }}" onclick="event.stopPropagation(); openGalleryFromElement(this)" class="px-2.5 py-1 text-xs font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-lg inline-flex items-center gap-1 transition-colors" title="Voir les photos de l'annonce">
                                                     <span class="material-symbols-outlined text-[15px]">photo_library</span>
-                                                    <span>Photos ({{ is_array($item->photos) ? count($item->photos) : 0 }})</span>
+                                                    <span>Photos ({{ count($itemPhotoUrls) }})</span>
                                                 </button>
                                             </div>
                                         </td>
@@ -586,8 +594,10 @@ $myAnnonces = $myAnnonces ?? collect();
                         <!-- Vignette / Image de couverture (Uniquement photos[0]) -->
                         <div class="relative w-full h-48 bg-slate-100 overflow-hidden">
                             @php
-                            $cover = is_array($ad->photos) && count($ad->photos) > 0 ? asset($ad->photos[0]) : asset('photo/default.png');
-                            $countPhotos = is_array($ad->photos) ? count($ad->photos) : 0;
+                            $adPhotos = is_array($ad->photos) ? $ad->photos : (is_string($ad->photos) ? json_decode($ad->photos, true) ?? [] : []);
+                            $adPhotoUrls = array_values(array_map(fn($p) => str_starts_with($p, 'http') ? $p : asset(ltrim($p, '/')), $adPhotos));
+                            $cover = count($adPhotoUrls) > 0 ? $adPhotoUrls[0] : asset('photo/default.png');
+                            $countPhotos = count($adPhotoUrls);
                             @endphp
                             <img src="{{ $cover }}" alt="{{ $ad->titre }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out" loading="lazy">
 
@@ -602,7 +612,7 @@ $myAnnonces = $myAnnonces ?? collect();
                             </div>
 
                             <!-- Bouton "Photos" flottant sur la carte -->
-                            <button type="button" data-photos="{{ e(json_encode($ad->photos)) }}" data-titre="{{ $ad->titre }}" onclick="openGalleryFromElement(this)" class="absolute bottom-2.5 right-2.5 bg-slate-900/85 hover:bg-emerald-600 text-white text-xs font-bold px-2.5 py-1 rounded-lg backdrop-blur-md shadow-sm inline-flex items-center gap-1.5 transition-all cursor-pointer">
+                            <button type="button" data-photos="{{ json_encode($adPhotoUrls) }}" data-titre="{{ $ad->titre }}" onclick="event.stopPropagation(); openGalleryFromElement(this)" class="absolute bottom-2.5 right-2.5 bg-slate-900/85 hover:bg-emerald-600 text-white text-xs font-bold px-2.5 py-1 rounded-lg backdrop-blur-md shadow-sm inline-flex items-center gap-1.5 transition-all cursor-pointer">
                                 <span class="material-symbols-outlined text-[16px]">photo_library</span>
                                 <span>Photos ({{ $countPhotos }})</span>
                             </button>
@@ -963,20 +973,22 @@ $myAnnonces = $myAnnonces ?? collect();
                     <div>
                         <div class="flex items-center gap-2.5">
                             <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight">Mon Profil</h1>
+                            @if($user->profil === 'vendeur')
                             <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">
-                                @if(Auth::user()->email_verified_at)
-                                ✓ Compte Vérifié
-                                @else
-                                En attente de vérification
-                                @endif
+                                Compte Vendeur
                             </span>
+                            @else
+                            <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800">
+                                Compte Client
+                            </span>
+                            @endif
                         </div>
-                        <p class="text-xs text-slate-500 mt-1">Consultez et modifiez vos informations personnelles ainsi que votre photo de profil.</p>
+                        <p class="text-xs text-slate-500 mt-1">Vous utilisez un compte client. Mutez vers un compte vendeur</p>
                     </div>
 
-                    <a href="{{ route('page_client') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-all">
-                        <span class="material-symbols-outlined text-[18px]">visibility</span>
-                        <span>Voir mon profil public</span>
+                    <a href="{{ route('verification.create') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-sm transition-all">
+                        <i class="material-symbols-outlined text-[18px] not-italic">visibility</i>
+                        <span>Vérifier maintenant</span>
                     </a>
                 </div>
 
@@ -1248,7 +1260,15 @@ $myAnnonces = $myAnnonces ?? collect();
             backdrop.classList.toggle('hidden');
         }
 
+        const canPublishAnnonce = {{ Auth::user()->canPublishAnnonce() ? 'true' : 'false' }};
+        const createAnnonceUrl = "{{ route('annonces.create') }}";
+
         function switchDashboardTab(tabName) {
+            if (tabName === 'publier' && !canPublishAnnonce) {
+                window.location.href = createAnnonceUrl;
+                return;
+            }
+
             const tabs = ['dashboard', 'mes-annonces', 'publier', 'profil'];
             tabs.forEach(t => {
                 const el = document.getElementById('tab-content-' + t);
@@ -1700,14 +1720,25 @@ $myAnnonces = $myAnnonces ?? collect();
             document.getElementById('gallery-title').innerText = title || 'Galerie photos';
             updateGalleryUI();
 
-            document.getElementById('gallery-lightbox-modal').classList.remove('hidden');
+            const modal = document.getElementById('gallery-lightbox-modal');
+            if (modal) {
+                modal.style.display = 'flex';
+                modal.classList.remove('hidden');
+            }
         }
 
         function openGalleryFromElement(el) {
             if (!el) return;
             try {
-                const rawPhotos = el.getAttribute('data-photos');
-                const photos = rawPhotos ? JSON.parse(rawPhotos) : [];
+                let rawPhotos = el.getAttribute('data-photos');
+                let photos = [];
+                if (rawPhotos) {
+                    const cleaned = rawPhotos.replace(/&quot;/g, '"').replace(/&#039;/g, "'").replace(/&amp;/g, '&');
+                    photos = JSON.parse(cleaned);
+                    if (typeof photos === 'string') {
+                        photos = JSON.parse(photos);
+                    }
+                }
                 const title = el.getAttribute('data-titre') || el.getAttribute('alt') || 'Galerie photos';
                 openPhotoGallery(photos, title);
             } catch (e) {
@@ -1716,7 +1747,11 @@ $myAnnonces = $myAnnonces ?? collect();
         }
 
         function closePhotoGallery() {
-            document.getElementById('gallery-lightbox-modal').classList.add('hidden');
+            const modal = document.getElementById('gallery-lightbox-modal');
+            if (modal) {
+                modal.style.display = 'none';
+                modal.classList.add('hidden');
+            }
         }
 
         function updateGalleryUI() {

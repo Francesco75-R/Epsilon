@@ -86,6 +86,10 @@
                     <li><a class="text-xs sm:text-sm text-slate-400 hover:text-white transition-colors" href="#">Support client 7j/7</a></li>
                     <li><a class="text-xs sm:text-sm text-slate-400 hover:text-white transition-colors" href="#">Signaler un abus</a></li>
                     <li><a class="text-xs sm:text-sm text-slate-400 hover:text-white transition-colors" href="#">Nous contacter</a></li>
+                    <li><a class="text-xs sm:text-sm text-slate-400 hover:text-white transition-colors flex items-center gap-1.5" href="{{ route('admin.login') }}" title="Connexion sécurisée administration">
+                            <span class="material-symbols-outlined text-[20px]">key</span>
+                            <span>connexion securisé</span>
+                        </a></li>
                 </ul>
 
                 <!-- Badge Protection Acheteur -->

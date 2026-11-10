@@ -62,9 +62,6 @@
         }
     </style>
 
-    <!-- Standalone CSS fallback pour WAMP / Apache -->
-    <link rel="stylesheet" href="{{ asset('css/marketplace.css') }}">
-
     @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @else
@@ -150,6 +147,8 @@
     </script>
     @endif
 
+    <!-- Standalone CSS pour WAMP / Apache -->
+    <link rel="stylesheet" href="{{ asset('css/marketplace.css') }}?v={{ filemtime(public_path('css/marketplace.css')) }}">
     @stack('styles')
 </head>
 
@@ -168,7 +167,7 @@
     <!-- ================================================================= -->
     <!-- MODALE GALERIE / LIGHTBOX PHOTOS (Accessible a TOUS y compris non connectes) -->
     <!-- ================================================================= -->
-    <div id="gallery-lightbox-modal" class="fixed inset-0 z-[100] bg-black/90 backdrop-blur-md flex flex-col justify-between p-4 sm:p-6 hidden">
+    <div id="gallery-lightbox-modal" class="fixed inset-0 z-[100] bg-black/90 backdrop-blur-md flex flex-col justify-between p-4 sm:p-6 hidden" style="display: none;">
         <!-- Top bar de la galerie -->
         <div class="flex items-center justify-between text-white max-w-5xl mx-auto w-full">
             <div class="flex items-center gap-3">
@@ -202,6 +201,83 @@
         </div>
     </div>
 
+    <!-- ================================================================= -->
+    <!-- MODALE FLOTTANTE : AJOUTER AU PANIER                              -->
+    <!-- ================================================================= -->
+    <div id="add-to-cart-modal" class="fixed inset-0 z-[110] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 hidden" style="display: none;" onclick="closeAddToCartModal(event)">
+        <div class="relative w-full max-w-md bg-white rounded-3xl shadow-2xl border border-slate-200/80 overflow-hidden transform transition-all p-6 sm:p-7 space-y-5" onclick="event.stopPropagation()">
+            
+            <!-- En-tête -->
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                <div class="flex items-center gap-2 text-secondary font-extrabold text-sm uppercase tracking-wide">
+                    <span class="material-symbols-outlined text-[20px]">shopping_cart</span>
+                    <span>Mettre au panier</span>
+                </div>
+                <button type="button" onclick="closeAddToCartModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition-colors cursor-pointer" title="Fermer">
+                    <span class="material-symbols-outlined text-[18px]">close</span>
+                </button>
+            </div>
+
+            <!-- Détails du produit sélectionné -->
+            <div class="flex items-center gap-4 bg-slate-50/80 p-3.5 rounded-2xl border border-slate-100">
+                <img id="cart-modal-img" src="" alt="Aperçu produit" class="w-20 h-20 rounded-xl object-cover border border-slate-200 flex-shrink-0" />
+                <div class="min-w-0 flex-1">
+                    <span id="cart-modal-cat" class="text-[11px] font-bold text-secondary uppercase tracking-wider block truncate">Catégorie</span>
+                    <h4 id="cart-modal-title" class="font-extrabold text-slate-900 text-sm sm:text-base leading-snug line-clamp-2 mt-0.5">Titre du produit</h4>
+                    <div class="flex items-center gap-1.5 mt-1 text-xs text-slate-500">
+                        <span class="material-symbols-outlined text-[14px] text-slate-400">location_on</span>
+                        <span id="cart-modal-lieu" class="truncate">Lomé</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Prix unitaire -->
+            <div class="flex items-baseline justify-between bg-emerald-50/50 p-3.5 rounded-2xl border border-emerald-100">
+                <span class="text-xs font-bold text-slate-600">Prix unitaire</span>
+                <div class="text-right">
+                    <span id="cart-modal-price" class="text-xl sm:text-2xl font-extrabold text-emerald-700">0</span>
+                    <span class="text-xs font-bold text-emerald-800">FCFA</span>
+                </div>
+            </div>
+
+            <!-- Sélecteur de Quantité -->
+            <div class="space-y-2">
+                <label class="text-xs font-bold text-slate-700 block">Quantité souhaitée</label>
+                <div class="flex items-center justify-between border border-slate-200 rounded-2xl p-2 bg-slate-50/50">
+                    <button type="button" onclick="changeCartQuantity(-1)" class="w-10 h-10 rounded-xl bg-white hover:bg-slate-200 text-slate-700 font-extrabold flex items-center justify-center shadow-sm transition-all active:scale-95 cursor-pointer">
+                        <span class="material-symbols-outlined text-[20px]">remove</span>
+                    </button>
+                    <div class="flex items-center gap-1 font-extrabold text-lg text-slate-900 px-4">
+                        <span id="cart-modal-qty">1</span>
+                    </div>
+                    <button type="button" onclick="changeCartQuantity(1)" class="w-10 h-10 rounded-xl bg-white hover:bg-slate-200 text-slate-700 font-extrabold flex items-center justify-center shadow-sm transition-all active:scale-95 cursor-pointer">
+                        <span class="material-symbols-outlined text-[20px]">add</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Sous-total -->
+            <div class="flex items-center justify-between pt-2 border-t border-slate-100 text-sm">
+                <span class="font-bold text-slate-600">Total à payer :</span>
+                <div class="text-right">
+                    <span id="cart-modal-total" class="font-extrabold text-xl text-primary">0</span>
+                    <span class="text-xs font-bold text-slate-500">FCFA</span>
+                </div>
+            </div>
+
+            <!-- Boutons d'action -->
+            <div class="flex items-center gap-3 pt-2">
+                <button type="button" onclick="closeAddToCartModal()" class="flex-1 py-3 px-4 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-100 transition-all text-center">
+                    Annuler
+                </button>
+                <button type="button" onclick="confirmAddToCart()" class="flex-1 py-3 px-4 bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-extrabold rounded-xl shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer active:scale-95">
+                    <span class="material-symbols-outlined text-[18px]">add_shopping_cart</span>
+                    <span>Mettre au panier</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Configuration globale Auth & Routes JS -->
     <script>
         window.isUserLoggedIn = {{ Auth::check() ? 'true' : 'false' }};
@@ -210,7 +286,7 @@
     </script>
 
     <!-- Scripts Client -->
-    <script src="{{ asset('js/marketplace.js') }}"></script>
+    <script src="{{ asset('js/marketplace.js') }}?v={{ filemtime(public_path('js/marketplace.js')) }}"></script>
     @stack('scripts')
 </body>
 
